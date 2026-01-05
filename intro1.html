@@ -140,6 +140,32 @@
             animation: buttonPress 0.3s ease-out;
         }
 
+        .skip-intro-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(200, 50, 50, 0.8);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            cursor: pointer;
+            z-index: 20;
+            transition: background 0.3s;
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out 0.5s forwards;
+        }
+
+        .skip-intro-button:hover {
+            background: rgba(200, 50, 50, 1);
+        }
+
+        .skip-intro-button:active {
+            transform: scale(0.95);
+        }
+
         .dialogue-box {
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
             position: absolute;
@@ -157,7 +183,6 @@
             border: 2px solid rgba(100, 150, 200, 0.6);
             z-index: 10;
             opacity: 0;
-            cursor: pointer;
         }
 
         .dialogue-box.fade-in {
@@ -209,11 +234,12 @@
         <img id="mainImage" src="calling.png" alt="Description of image">
         <img id="overlayImage" src="" alt="Overlay" style="display: none;">
         <div id="clickIndicator" style="display: none;">↓</div>
-        <div id="dialogueBox" class="dialogue-box" onclick="skipDialogueAnimation()">
+        <div id="dialogueBox" class="dialogue-box">
             <div id="speakerName" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: bold; margin-bottom: 10px; font-size: 20px; letter-spacing: 0.5px;">You</div>
             <div id="dialogueText">Who is calling me at this time?</div>
         </div>
         <button id="nextButton" class="next-arrow" onclick="nextDialogue()">→</button>
+        <button id="skipIntroButton" class="skip-intro-button" onclick="skipIntro()">Skip Intro</button>
         
         <!-- Image map for clickable area -->
         <div id="imageMapContainer" class="image-map-container">
@@ -292,16 +318,6 @@
             type();
         }
 
-        function skipDialogueAnimation() {
-            if (isTyping) {
-                // Skip typing animation, show full text but don't advance dialogue
-                clearTimeout(typingTimeout);
-                const dialogueTextElement = document.getElementById('dialogueText');
-                dialogueTextElement.textContent = currentText;
-                isTyping = false;
-            }
-        }
-
         function calculateCentroid(coords) {
             const points = coords.split(',').map(Number);
             let sumX = 0, sumY = 0;
@@ -335,13 +351,15 @@
 
         function nextDialogue() {
             if (isTyping) {
-                // If still typing, complete the text immediately
+                // First click while typing: skip animation and show full text
+                clearTimeout(typingTimeout);
                 const dialogueTextElement = document.getElementById('dialogueText');
                 dialogueTextElement.textContent = currentText;
                 isTyping = false;
                 return;
             }
 
+            // Second click (not typing): advance to next dialogue
             currentDialogue++;
             if (currentDialogue >= dialogues.length) {
                 // Do nothing when reaching the end
@@ -361,6 +379,11 @@
             } else {
                 nextDialogue();
             }
+        }
+
+        function skipIntro() {
+            // Jump to cases.html
+            window.location.href = "cases.html";
         }
 
         function updateDisplay() {
