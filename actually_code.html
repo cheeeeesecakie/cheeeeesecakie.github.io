@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screen {
+            width: 960px;
+            height: 540px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            border-radius: 15px;
+            box-shadow: 0 10px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* Desktop */
+        .desktop {
+            flex: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 20px;
+            align-content: start;
+            overflow-y: auto;
+        }
+
+        /* App Icon */
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .app-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .app-icon.disabled-app {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: auto;
+        }
+
+        .app-icon.disabled-app:hover {
+            transform: none;
+        }
+
+        .app-icon-box {
+            width: 85px;
+            height: 85px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: box-shadow 0.2s;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        .app-icon:hover .app-icon-box {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .app-label {
+            font-size: 13px;
+            font-weight: 600;
+            max-width: 95px;
+            word-wrap: break-word;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            line-height: 1.3;
+        }
+
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            border: 2px solid #1a1a2e;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Glowing animation */
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 20px rgba(142, 68, 173, 0.3);
+            }
+            50% {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 40px rgba(142, 68, 173, 0.8);
+            }
+        }
+
+        @keyframes glowGreen {
+            0%, 100% {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 20px rgba(39, 174, 96, 0.3);
+            }
+            50% {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 40px rgba(39, 174, 96, 0.8);
+            }
+        }
+
+        .app-icon-box.glowing {
+            animation: glow 1.5s ease-in-out infinite;
+        }
+
+        .app-icon-box.glowing-green {
+            animation: glowGreen 1.5s ease-in-out infinite;
+        }
+
+        /* App-specific colors */
+        .scam-helpline-box {
+            background: linear-gradient(135deg, #8e44ad, #6c3483);
+        }
+
+        .messages-box {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        .chrome-box {
+            background: linear-gradient(135deg, #16a085, #117a65);
+        }
+
+        .files-box {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+
+        .settings-box {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .code-box {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+        }
+
+        .music-box {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+        }
+
+        .photos-box {
+            background: linear-gradient(135deg, #1abc9c, #16a085);
+        }
+
+        /* Taskbar */
+        .taskbar {
+            background: rgba(0, 0, 0, 0.95);
+            height: 45px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+        }
+
+        .taskbar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .taskbar-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 16px;
+        }
+
+        .taskbar-icon:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .taskbar-time {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Modal for opening app */
+        .app-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            width: 960px;
+            height: 540px;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .app-modal.active {
+            display: flex;
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            background: #2c3e50;
+            border-bottom: 2px solid #34495e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: #ecf0f1;
+        }
+
+        .modal-content {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .app-content {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            border-radius: 15px;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Messages App Container */
+        .messages-app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 0 0 15px 15px;
+        }
+
+        /* Contacts List */
+        .contacts-panel {
+            width: 280px;
+            background: #f8f9fa;
+            border-right: 2px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: 0 0 0 15px;
+        }
+
+        .contacts-header {
+            padding: 18px 20px;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 2px solid #dee2e6;
+            color: #2c3e50;
+        }
+
+        .contacts-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .contact-item {
+            padding: 14px 20px;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .contact-item:hover {
+            background: #e9ecef;
+        }
+
+        .contact-item.active {
+            background: #d0e8f2;
+            border-left: 5px solid #3498db;
+        }
+
+        .contact-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f0f0f0;
+        }
+
+        .contact-item.disabled:hover {
+            background: #f0f0f0;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .contact-preview {
+            font-size: 12px;
+            color: #7f8c8d;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Contact Notification Indicator */
+        .contact-notification {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #e74c3c;
+            border-radius: 50%;
+        }
+
+        /* Chat Area */
+        .chat-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 0 0 15px 0;
+        }
+
+        .chat-header {
+            padding: 14px 20px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f9fa;
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-header-info h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: #2c3e50;
+        }
+
+        .chat-header-info p {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #ffffff;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .message.received {
+            justify-content: flex-start;
+        }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 65%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .received .message-content {
+            background: #e9ecef;
+            color: #2c3e50;
+        }
+
+        .sent .message-content {
+            background: #3498db;
+            color: white;
+        }
+
+        .message-content a {
+            color: #2980b9;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .message-content a:hover {
+            color: #1f618d;
+        }
+
+        .message-attachment {
+            max-width: 65%;
+            padding: 8px 0;
+        }
+
+        .pdf-file {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .pdf-file:hover {
+            background: #e9ecef;
+        }
+
+        .pdf-icon {
+            width: 35px;
+            height: 45px;
+            background: #e74c3c;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .pdf-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .pdf-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 13px;
+        }
+
+        .pdf-size {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .chat-input-area {
+            padding: 12px 20px;
+            border-top: 2px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            background: #f8f9fa;
+            border-radius: 0 0 15px 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 22px;
+            font-size: 14px;
+            outline: none;
+            color: #2c3e50;
+        }
+
+        .chat-input::placeholder {
+            color: #95a5a6;
+        }
+
+        .chat-input:focus {
+            border-color: #3498db;
+        }
+
+        .send-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #2980b9;
+        }
+
+        /* PDF Modal */
+        .pdf-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pdf-modal.active {
+            display: flex;
+        }
+
+        .pdf-modal-content {
+            background: white;
+            width: 85%;
+            max-width: 720px;
+            height: 480px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 5px 40px rgba(0,0,0,0.16);
+        }
+
+        .pdf-modal-header {
+            padding: 18px 20px;
+            border-bottom: 2px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .pdf-modal-header h2 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .pdf-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .pdf-viewer {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #ecf0f1;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .pdf-page {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .pdf-title {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 22px;
+            color: #2c3e50;
+        }
+
+        .pdf-section {
+            margin-bottom: 18px;
+        }
+
+        .pdf-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .pdf-section-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #34495e;
+        }
+
+        .pdf-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .pdf-list li {
+            padding: 8px 0 8px 22px;
+            position: relative;
+            color: #34495e;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .pdf-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .no-chat-selected {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #95a5a6;
+            font-size: 16px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="screen">
+        <div class="desktop">
+            <!-- Scam Helpline Program -->
+            <div class="app-icon" id="scamHelplineIcon" class="disabled-app" onclick="handleScamHelplineClick(event)">
+                <div class="app-icon-box scam-helpline-box">📞</div>
+                <div class="app-label">Scam Helpline</div>
+            </div>
+
+            <!-- Messages -->
+            <div class="app-icon" id="messagesAppIcon" onclick="openApp('messages', event)">
+                <div class="app-icon-box messages-box">💬</div>
+                <div class="notification-badge" id="messagesBadge">4</div>
+                <div class="app-label">Messages</div>
+            </div>
+
+            <!-- Chrome -->
+            <div class="app-icon" onclick="openApp('chrome', event)">
+                <div class="app-icon-box chrome-box">🌐</div>
+                <div class="app-label">Chrome</div>
+            </div>
+
+            <!-- Files -->
+            <div class="app-icon" onclick="openApp('files', event)">
+                <div class="app-icon-box files-box">📁</div>
+                <div class="app-label">Files</div>
+            </div>
+
+            <!-- Settings -->
+            <div class="app-icon" onclick="openApp('settings', event)">
+                <div class="app-icon-box settings-box">⚙️</div>
+                <div class="app-label">Settings</div>
+            </div>
+
+            <!-- Code Editor -->
+            <div class="app-icon" onclick="openApp('code', event)">
+                <div class="app-icon-box code-box">💻</div>
+                <div class="app-label">VS Code</div>
+            </div>
+
+            <!-- Music -->
+            <div class="app-icon" onclick="openApp('music', event)">
+                <div class="app-icon-box music-box">🎵</div>
+                <div class="app-label">Music</div>
+            </div>
+
+            <!-- Photos -->
+            <div class="app-icon" onclick="openApp('photos', event)">
+                <div class="app-icon-box photos-box">📷</div>
+                <div class="app-label">Photos</div>
+            </div>
+        </div>
+
+        <!-- Taskbar -->
+        <div class="taskbar">
+            <div class="taskbar-left">
+                <div class="taskbar-icon">🪟</div>
+                <div class="taskbar-icon">🔍</div>
+            </div>
+            <div class="taskbar-time" id="time">12:00</div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="closeApp()"></div>
+
+    <!-- Messages Modal -->
+    <div class="app-modal" id="messages-modal">
+        <div class="modal-header">
+            <h2>💬 Messages</h2>
+            <button class="modal-close-btn" onclick="closeApp()">✕</button>
+        </div>
+        <div class="modal-content">
+            <div class="messages-app-container">
+                <!-- Contacts List -->
+                <div class="contacts-panel">
+                    <div class="contacts-header">Messages</div>
+                    <div class="contacts-list">
+                        <div class="contact-item active" onclick="selectContact(0, this)">
+                            <div class="contact-name">Lily</div>
+                            <div class="contact-preview">Good luck on your shift 🎉</div>
+                            <div class="contact-notification"></div>
+                        </div>
+                        <div class="contact-item" onclick="selectContact(1, this)">
+                            <div class="contact-name">Jack</div>
+                            <div class="contact-preview">could you send me your pdf after...</div>
+                        </div>
+                        <div class="contact-item disabled" id="scamHelplineContact" onclick="selectContact(2, this)">
+                            <div class="contact-name">Scam Helpline Volunteers</div>
+                            <div class="contact-preview">Here is the link to the portal...</div>
+                            <div class="contact-notification"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Panel -->
+                <div class="chat-panel">
+                    <div id="chatHeader" class="chat-header">
+                        <div class="chat-header-info">
+                            <div>
+                                <h2>Select a contact</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="no-chat-selected">Select a contact to view messages</div>
+                    </div>
+
+                    <div id="chatInputArea" class="chat-input-area" style="display: none;">
+                        <input type="text" class="chat-input" placeholder="Message...">
+                        <button class="send-btn">➤</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Modal -->
+    <div id="pdfModal" class="pdf-modal">
+        <div class="pdf-modal-content">
+            <div class="pdf-modal-header">
+                <h2>Scam Helpline Manual</h2>
+                <button class="pdf-close-btn" onclick="closePdfModal()">✕</button>
+            </div>
+            <div class="pdf-viewer">
+                <div class="pdf-page">
+                    <div class="pdf-title">SCAM HELPLINE MANUAL</div>
+                    
+                    <div class="pdf-section">
+                        <div class="pdf-section-title">1. Introduction</div>
+                        <div class="pdf-section-content">
+                            Welcome to the Scam Helpline team! This manual provides comprehensive guidelines for responding to calls and assisting victims of scams. Our mission is to help people protect themselves and understand common fraud tactics.
+                        </div>
+                    </div>
+
+                    <div class="pdf-section">
+                        <div class="pdf-section-title">2. Common Scam Types</div>
+                        <ul class="pdf-list">
+                            <li><strong>Phishing Scams:</strong> Fraudulent emails or texts requesting personal information</li>
+                            <li><strong>Tech Support Scams:</strong> False claims of computer viruses or technical issues</li>
+                            <li><strong>Romance Scams:</strong> Building relationships to extract money or personal information</li>
+                            <li><strong>Lottery/Prize Scams:</strong> Claiming the victim has won something they didn't enter</li>
+                            <li><strong>IRS/Tax Scams:</strong> Impersonating tax authorities demanding immediate payment</li>
+                        </ul>
+                    </div>
+
+                    <div class="pdf-section">
+                        <div class="pdf-section-title">3. Call Handling Procedures</div>
+                        <ul class="pdf-list">
+                            <li>Listen empathetically to the caller's situation</li>
+                            <li>Ask clarifying questions to understand the scam</li>
+                            <li>Provide information about the specific scam type</li>
+                            <li>Advise on immediate protective steps</li>
+                            <li>Direct to appropriate authorities if needed</li>
+                        </ul>
+                    </div>
+
+                    <div class="pdf-section">
+                        <div class="pdf-section-title">4. Resources & Support</div>
+                        <div class="pdf-section-content">
+                            Familiarize yourself with local law enforcement contacts, FTC guidelines, and support resources for victims. Keep detailed notes on each call for follow-up and reporting purposes.
+                        </div>
+                    </div>
+
+                    <div class="pdf-section">
+                        <div class="pdf-section-title">5. Code of Conduct</div>
+                        <ul class="pdf-list">
+                            <li>Maintain confidentiality of all caller information</li>
+                            <li>Remain professional and patient with all callers</li>
+                            <li>Never pressure or judge victims</li>
+                            <li>Follow all company protocols and compliance guidelines</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-modal" id="chrome-modal">
+        <div class="modal-header">
+            <h2>🌐 Chrome</h2>
+            <button class="modal-close-btn" onclick="closeApp()">✕</button>
+        </div>
+        <div class="modal-content" style="background: #fff; padding: 20px; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #333; border-radius: 0 0 15px 15px;">
+            <div style="font-size: 45px; margin-bottom: 15px;">🌐</div>
+            <h3 style="font-size: 16px; color: #2c3e50;">Google Chrome</h3>
+            <p style="margin-top: 8px; font-size: 14px; color: #7f8c8d;">Web browser</p>
+        </div>
+    </div>
+
+    <div class="app-modal" id="files-modal">
+        <div class="modal-header">
+            <h2>📁 Files</h2>
+            <button class="modal-close-btn" onclick="closeApp()">✕</button>
+        </div>
+        <div class="modal-content" style="background: #fff; padding: 15px; border-radius: 0 0 15px 15px;">
+            <div style="padding: 15px; color: #2c3e50;">
+                <p style="font-size: 15px;">📄 Documents</p>
+                <p style="font-size: 15px; margin-top: 12px;">📸 Pictures</p>
+                <p style="font-size: 15px; margin-top: 12px;">🎵 Music</p>
+                <p style="font-size: 15px; margin-top: 12px;">📥 Downloads</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-modal" id="settings-modal">
+        <div class="modal-header">
+            <h2>⚙️ Settings</h2>
+            <button class="modal-close-btn" onclick="closeApp()">✕</button>
+        </div>
+        <div class="modal-content" style="background: #fff; padding: 15px; border-radius: 0 0 15px 15px;">
+            <div style="padding: 15px; color: #2c3e50;">
+                <h3 style="margin-bottom: 15px; font-size: 15px; font-weight: 600;">System Settings</h3>
+                <p style="font-size: 14px; margin-bottom: 10px;">Display</p>
+                <p style="font-size: 14px; margin-bottom: 10px;">Sound</p>
+                <p style="font-size: 14px; margin-bottom: 10px;">Network</p>
+                <p style="font-size: 14px; margin-bottom: 10px;">Storage</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-modal" id="code-modal">
+        <div class="modal-header">
+            <h2>💻 VS Code</h2>
+            <button class="modal-close-btn" onclick="closeApp()">✕</button>
+        </div>
+        <div class="modal-content" style="background: #1e1e1e; color: #d4d4d4; padding: 20px; font-family: 'Courier New', monospace; font-size: 14px; border-radius: 0 0 15px 15px;">
+            <div style="padding: 15px;">
+                <p>// Visual Studio Code</p>
+                <p style="color: #569cd6;">function</p>
+                <p style="margin-top: 8px;"><span style="color: #ce9178;">console</span>.log('Hello World');</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-modal" id="music-modal">
+        <div class="modal-header">
+            <h2>🎵 Music Player</h2>
+            <button class="modal-close-btn" onclick="closeApp()">✕</button>
+        </div>
+        <div class="modal-content" style="background: #1a1a2e; color: #fff; display: flex; align-items: center; justify-content: center; flex-direction: column; border-radius: 0 0 15px 15px;">
+            <div style="font-size: 55px; margin-bottom: 15px;">🎵</div>
+            <h3 style="font-size: 16px;">Music Player</h3>
+            <p style="font-size: 14px; color: #bdc3c7; margin-top: 8px;">No tracks playing</p>
+        </div>
+    </div>
+
+    <div class="app-modal" id="photos-modal">
+        <div class="modal-header">
+            <h2>📷 Photos</h2>
+            <button class="modal-close-btn" onclick="closeApp()">✕</button>
+        </div>
+        <div class="modal-content" style="background: #ecf0f1; padding: 15px; border-radius: 0 0 15px 15px;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 15px;">
+                <div style="background: #bdc3c7; height: 90px; border-radius: 10px;"></div>
+                <div style="background: #bdc3c7; height: 90px; border-radius: 10px;"></div>
+                <div style="background: #bdc3c7; height: 90px; border-radius: 10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lilyViewed = false;
+        let messagesAppOpened = false;
+        let pdfRead = false;
+
+        const contacts = [
+            {
+                name: "Lily",
+                status: "online",
+                messages: [
+                    { type: "received", text: "Here's the manual, don't lose this one 🤣" },
+                    { type: "message-attachment", pdf: true, fileName: "Scam_Helpline_Manual.pdf", fileSize: "2.4 MB" },
+                    { type: "received", text: "Good luck on your shift 🎉" }
+                ]
+            },
+            {
+                name: "Jack",
+                status: "offline",
+                messages: [
+                    { type: "received", text: "have you finished the assignment?" },
+                    { type: "sent", text: "almost" },
+                    { type: "received", text: "could you send me your pdf after youre done, thanks 😎" }
+                ]
+            },
+            {
+                name: "Scam Helpline Volunteers",
+                status: "Group",
+                messages: [
+                    { type: "received", text: "Thanks for signing up to be a volunteer for the Scam Helpline!" },
+                    { type: "received", text: "Your commitment to helping others avoid fraud is invaluable to our mission." },
+                    { type: "received", text: "We're excited to have you on the team and looking forward to working together to protect our community." },
+                    { type: "received", text: 'Here is the link to the scam helpline login portal: <a href="portal.html" onclick="window.location.href=\'portal.html\'; return false;">scamhelplinevolunteerloginportal.com</a>' }
+                ]
+            }
+        ];
+
+        // Add glowing effect to Messages app on page load
+        window.addEventListener('load', function() {
+            const messagesBox = document.querySelector('#messagesAppIcon .app-icon-box');
+            if (messagesBox) {
+                messagesBox.classList.add('glowing-green');
+            }
+        });
+
+        function handleScamHelplineClick(event) {
+            event.preventDefault();
+            if (!messagesAppOpened) {
+                // App is disabled, do nothing
+                return;
+            }
+            // If Messages was opened, navigate to portal
+            window.location.href = 'portal.html';
+        }
+
+        function selectContact(index, element) {
+            // Check if trying to access Scam Helpline Volunteers (index 2) before viewing Lily
+            if (index === 2 && !lilyViewed) {
+                return; // Prevent access
+            }
+
+            document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            const contact = contacts[index];
+            const chatHeader = document.getElementById('chatHeader');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInputArea = document.getElementById('chatInputArea');
+
+            chatHeader.innerHTML = `
+                <div class="chat-header-info">
+                    <div>
+                        <h2>${contact.name}</h2>
+                        <p>${contact.status}</p>
+                    </div>
+                </div>
+            `;
+
+            chatMessages.innerHTML = '';
+            contact.messages.forEach(msg => {
+                if (msg.type === 'message-attachment' && msg.pdf) {
+                    const attachmentDiv = document.createElement('div');
+                    attachmentDiv.className = 'message received';
+                    attachmentDiv.innerHTML = `
+                        <div class="message-attachment">
+                            <div class="pdf-file" onclick="openPdfModal()">
+                                <div class="pdf-icon">PDF</div>
+                                <div class="pdf-info">
+                                    <div class="pdf-name">${msg.fileName}</div>
+                                    <div class="pdf-size">${msg.fileSize}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    chatMessages.appendChild(attachmentDiv);
+                } else {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${msg.type}`;
+                    messageDiv.innerHTML = `<div class="message-content">${msg.text}</div>`;
+                    chatMessages.appendChild(messageDiv);
+                }
+            });
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            chatInputArea.style.display = 'flex';
+
+            // Mark Lily as viewed when her contact is selected
+            if (index === 0) {
+                lilyViewed = true;
+                // Enable the Scam Helpline Volunteers contact
+                const scamContact = document.getElementById('scamHelplineContact');
+                if (scamContact) {
+                    scamContact.classList.remove('disabled');
+                }
+            }
+
+            // Clear notification when contact is selected
+            if (index === 0 || index === 2) {
+                clearNotification(index);
+            }
+        }
+
+        function clearNotification(index) {
+            const notification = document.querySelector(`.contact-item:nth-child(${index + 1}) .contact-notification`);
+            const messagesBadge = document.getElementById('messagesBadge');
+            
+            if (notification) {
+                notification.style.display = 'none';
+            }
+            
+            // Decrease badge count when first or last contact is clicked
+            if (messagesBadge && (index === 0 || index === 2)) {
+                let currentCount = parseInt(messagesBadge.textContent);
+                if (currentCount > 1) {
+                    currentCount--;
+                    messagesBadge.textContent = currentCount;
+                } else {
+                    messagesBadge.style.display = 'none';
+                }
+            }
+        }
+
+        function openPdfModal() {
+            document.getElementById('pdfModal').classList.add('active');
+        }
+
+        function closePdfModal() {
+            document.getElementById('pdfModal').classList.remove('active');
+            pdfRead = true;
+        }
+
+        document.getElementById('pdfModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePdfModal();
+            }
+        });
+
+        function openApp(appName, event) {
+            event.preventDefault();
+            const modalId = appName + '-modal';
+            const modal = document.getElementById(modalId);
+            const overlay = document.getElementById('overlay');
+            
+            if (modal) {
+                modal.classList.add('active');
+                overlay.classList.add('active');
+                
+                // Mark Messages app as opened
+                if (appName === 'messages') {
+                    messagesAppOpened = true;
+                    // Remove disabled state from Scam Helpline app
+                    const scamIcon = document.getElementById('scamHelplineIcon');
+                    if (scamIcon) {
+                        scamIcon.classList.remove('disabled-app');
+                    }
+                    const messagesBox = document.querySelector('#messagesAppIcon .app-icon-box');
+                    if (messagesBox) {
+                        messagesBox.classList.remove('glowing-green');
+                    }
+                }
+            }
+        }
+
+        function closeApp() {
+            const modals = document.querySelectorAll('.app-modal');
+            const overlay = document.getElementById('overlay');
+            
+            modals.forEach(modal => modal.classList.remove('active'));
+            overlay.classList.remove('active');
+            closePdfModal();
+
+            // Add glowing effect to Scam Helpline app after closing Messages
+            const scamHelplineBox = document.querySelector('#scamHelplineIcon .app-icon-box');
+            if (scamHelplineBox) {
+                scamHelplineBox.classList.add('glowing');
+            }
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('time').textContent = hours + ':' + minutes;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeApp();
+            }
+        });
+    </script>
+</body>
+</html>

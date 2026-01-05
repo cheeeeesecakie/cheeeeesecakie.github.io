@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case-1: Netflix Email</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 960px;
+            height: 540px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #e50914;
+            border-bottom: 3px solid #e50914;
+            padding-bottom: 10px;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        .case-info {
+            margin: 10px 0;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #e50914;
+            font-size: 16px;
+        }
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
+        .value {
+            margin-left: 10px;
+        }
+        .score-display {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .email-section {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .email-header {
+            background-color: #e50914;
+            color: white;
+            padding: 10px;
+            margin: -15px -15px 15px -15px;
+            border-radius: 5px 5px 0 0;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .email-content {
+            background-color: white;
+            padding: 15px;
+            border-radius: 3px;
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+        .email-from {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+            word-spacing: -0.3em;
+        }
+        .email-from:hover {
+            outline: 2px dashed #e50914;
+        }
+        .email-from.selected {
+            outline: 3px solid #e50914;
+            background-color: #fff3cd;
+        }
+        .clickable-word {
+            cursor: pointer;
+            padding: 2px 4px;
+            transition: all 0.2s;
+            border-radius: 2px;
+        }
+        .clickable-word:hover {
+            outline: 2px dashed #999;
+        }
+        .clickable-word.selected {
+            outline: 3px circle #e50914;
+            background-color: #fff3cd;
+        }
+        .clickable-word.correct {
+            outline: 3px solid #4CAF50;
+            background-color: #c8e6c9;
+        }
+        .clickable-word.incorrect {
+            outline: 3px solid #f44336;
+            background-color: #ffcdd2;
+        }
+        .fake-link {
+            color: #0066cc;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .fake-link:hover {
+            color: #0052a3;
+        }
+        .word-group {
+            display: inline;
+        }
+        .word-group .clickable-word.correct {
+            outline: 3px solid #4CAF50;
+            background-color: #c8e6c9;
+        }
+        .email-body {
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-spacing: -0.3em;
+        }
+        .restart-button {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .restart-button:hover {
+            background-color: #c70812;
+        }
+        .restart-button.selected {
+            outline: 3px solid #333;
+            background-color: #b00611;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 15px;
+            border: 2px solid #e50914;
+            border-radius: 8px;
+            width: 550px;
+            max-height: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            overflow-y: auto;
+        }
+        .modal h2 {
+            color: #e50914;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+        .modal p {
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .modal button {
+            background-color: #e50914;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            margin-right: 8px;
+            margin-top: 10px;
+        }
+        .modal button:hover {
+            background-color: #c70812;
+        }
+        .fake-website {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: Arial, sans-serif;
+        }
+        .fake-website-header {
+            background-color: #333;
+            color: white;
+            padding: 8px;
+            margin: -10px -10px 10px -10px;
+            border-radius: 5px 5px 0 0;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .fake-website-content {
+            background-color: white;
+            padding: 10px;
+        }
+        .fake-login-form {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .fake-login-btn {
+            width: 100%;
+            padding: 6px;
+            background-color: #e50914;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .website-url {
+            background-color: #f0f0f0;
+            padding: 6px;
+            margin: 8px 0;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 11px;
+            word-break: break-all;
+            border: 1px solid #ddd;
+        }
+        .suspicious-reasons {
+            background-color: #ffe6e6;
+            border: 1px solid #e50914;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        .suspicious-reasons h3 {
+            color: #e50914;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .suspicious-reasons ul {
+            margin-left: 18px;
+        }
+        .suspicious-reasons li {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Case-1: Netflix Account Suspension</h1>
+        
+        <div class="case-info">
+            <div><span class="label">Profile:</span><span class="value">Daniel</span></div>
+            <div><span class="label">Platform:</span><span class="value">Email</span></div>
+            <div><span class="label">Details:</span><span class="value">Hi, I got a email from Nextflix saying that my account is going to be suspended next month. Is this a scam?</span></div>
+        </div>
+
+        <div class="score-display">
+            📊 Suspicious Parts Found: <span id="foundCount">0</span> / 4
+        </div>
+
+        <div class="email-section">
+            <div class="email-header">Suspicious Email from Netflix</div>
+            <div class="email-content">
+                <div class="email-from" onclick="clickWord(this, false)">From: <span class="clickable-word" onclick="clickWord(this, event)">Nextflix</span> <span class="clickable-word" onclick="clickWord(this, event)">Team</span> &lt;<span class="clickable-word" data-suspicious="true" data-info="email" data-group="email-group" onclick="clickWord(this, event)">Membership@Nextfl1x-alerts.com</span>&gt;</div>
+                
+                <div class="email-body">
+<span class="clickable-word" onclick="clickWord(this, event)">Hi</span> <span class="clickable-word" onclick="clickWord(this, event)">Daniel,</span>
+
+<span class="clickable-word" onclick="clickWord(this, event)">We</span> <span class="clickable-word" onclick="clickWord(this, event)">were</span> <span class="clickable-word" onclick="clickWord(this, event)">unable</span> <span class="clickable-word" onclick="clickWord(this, event)">to</span> <span class="clickable-word" onclick="clickWord(this, event)">validate</span> <span class="clickable-word" onclick="clickWord(this, event)">your</span> <span class="word-group"><span class="clickable-word" data-suspicious="true" data-info="billing" data-group="billing-group" onclick="clickWord(this, event)">billing</span> <span class="clickable-word" data-suspicious="true" data-info="billing" data-group="billing-group" onclick="clickWord(this, event)">information</span></span> <span class="clickable-word" onclick="clickWord(this, event)">for</span> <span class="clickable-word" onclick="clickWord(this, event)">the</span> <span class="clickable-word" onclick="clickWord(this, event)">next</span> <span class="clickable-word" onclick="clickWord(this, event)">billing</span> <span class="clickable-word" onclick="clickWord(this, event)">cycle</span> <span class="clickable-word" onclick="clickWord(this, event)">of</span> <span class="clickable-word" onclick="clickWord(this, event)">your</span> <span class="clickable-word" onclick="clickWord(this, event)">subscription</span> <span class="clickable-word" onclick="clickWord(this, event)">therefore</span> <span class="clickable-word" onclick="clickWord(this, event)">we'll</span> <span class="clickable-word" onclick="clickWord(this, event)">suspend</span> <span class="clickable-word" onclick="clickWord(this, event)">your</span> <span class="clickable-word" onclick="clickWord(this, event)">membership</span> <span class="clickable-word" onclick="clickWord(this, event)">if</span> <span class="clickable-word" onclick="clickWord(this, event)">we</span> <span class="clickable-word" onclick="clickWord(this, event)">do</span> <span class="clickable-word" onclick="clickWord(this, event)">not</span> <span class="clickable-word" onclick="clickWord(this, event)">receive</span> <span class="clickable-word" onclick="clickWord(this, event)">a</span> <span class="clickable-word" onclick="clickWord(this, event)">response</span> <span class="clickable-word" onclick="clickWord(this, event)">from</span> <span class="clickable-word" onclick="clickWord(this, event)">you</span> <span class="clickable-word" onclick="clickWord(this, event)">within</span> <span class="clickable-word" data-suspicious="true" data-info="urgency" data-group="urgency-group" onclick="clickWord(this, event)">48hours</span>.
+
+<span class="clickable-word" onclick="clickWord(this, event)">To</span> <span class="clickable-word" onclick="clickWord(this, event)">continue</span> <span class="clickable-word" onclick="clickWord(this, event)">your</span> <span class="clickable-word" onclick="clickWord(this, event)">membership,</span> <span class="clickable-word" onclick="clickWord(this, event)">simply</span> <span class="clickable-word" onclick="clickWord(this, event)">click</span> <span class="clickable-word" onclick="clickWord(this, event)">the</span> <span class="clickable-word" onclick="clickWord(this, event)">button</span> <span class="clickable-word" onclick="clickWord(this, event)">below</span> <span class="clickable-word" onclick="clickWord(this, event)">to</span> <span class="clickable-word" onclick="clickWord(this, event)">update</span> <span class="clickable-word" onclick="clickWord(this, event)">your</span> <span class="clickable-word" onclick="clickWord(this, event)">details</span> <span class="clickable-word" onclick="clickWord(this, event)">and</span> <span class="clickable-word" onclick="clickWord(this, event)">continue</span> <span class="clickable-word" onclick="clickWord(this, event)">using</span> <span class="clickable-word" onclick="clickWord(this, event)">our</span> <span class="clickable-word" onclick="clickWord(this, event)">services.</span>
+                </div>
+
+                <button class="restart-button" onclick="openFakeWebsiteModal()">Restart Membership</button>
+
+                <div class="email-body">
+<span class="clickable-word" onclick="clickWord(this, event)">We're</span> <span class="clickable-word" onclick="clickWord(this, event)">here</span> <span class="clickable-word" onclick="clickWord(this, event)">to</span> <span class="clickable-word" onclick="clickWord(this, event)">help</span> <span class="clickable-word" onclick="clickWord(this, event)">if</span> <span class="clickable-word" onclick="clickWord(this, event)">you</span> <span class="clickable-word" onclick="clickWord(this, event)">need</span> <span class="clickable-word" onclick="clickWord(this, event)">it.</span> <span class="clickable-word" onclick="clickWord(this, event)">Visit</span> <span class="clickable-word" onclick="clickWord(this, event)">the</span> <span class="fake-link" onclick="clickWord(this, event)">Help</span> <span class="fake-link" onclick="clickWord(this, event)">Center</span> <span class="clickable-word" onclick="clickWord(this, event)">for</span> <span class="clickable-word" onclick="clickWord(this, event)">more</span> <span class="clickable-word" onclick="clickWord(this, event)">info</span> <span class="clickable-word" onclick="clickWord(this, event)">or</span> <span class="fake-link" onclick="clickWord(this, event)">Contact</span> <span class="fake-link" onclick="clickWord(this, event)">Us</span>.
+
+- <span class="clickable-word" onclick="clickWord(this, event)">The</span> <span class="clickable-word" onclick="clickWord(this, event)">Nextflix</span> <span class="clickable-word" onclick="clickWord(this, event)">team</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Information Modals -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Fake Sender Email Address</h2>
+            <p><strong>Issue:</strong> The sender email "Membership@Nextfl1x-alerts.com" is fake</p>
+            <p>The domain uses a "1" instead of "i" and "-alerts" which Netflix would never use.</p>
+            <p>Real Netflix uses domains like noreply@netflix.com or support@netflix.com</p>
+            <button onclick="closeModal('emailModal')">Got it!</button>
+        </div>
+    </div>
+
+    <div id="billingModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Fake Billing Threat</h2>
+            <p><strong>Issue:</strong> Netflix doesn't suspend accounts via email links for billing issues.</p>
+            <p>Real Netflix sends legitimate billing notifications and allows you to update payment info through their official website or app.</p>
+            <p>This is a pressure tactic to make you panic and click the malicious link.</p>
+            <button onclick="closeModal('billingModal')">Got it!</button>
+        </div>
+    </div>
+
+    <div id="urgencyModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Artificial Urgency</h2>
+            <p><strong>Issue:</strong> "48 hours" deadline creates panic and pressure.</p>
+            <p>Scammers use this tactic to prevent victims from thinking clearly and verifying the email's legitimacy.</p>
+            <p><strong>Real companies</strong> give you reasonable time to resolve billing issues.</p>
+            <button onclick="closeModal('urgencyModal')">Got it!</button>
+        </div>
+    </div>
+
+    <div id="fakeWebsiteModal" class="modal">
+        <div class="modal-content">
+            <h2>Website</h2>
+            
+            <div class="website-url">
+                https://<span class="clickable-word" data-suspicious="true" data-info="website" data-group="website-group" onclick="clickWord(this, event)">nextfl1x-account-support.com</span>/login
+            </div>
+
+            <div class="fake-website">
+                <div class="fake-website-header">Netflix Account Support</div>
+                <div class="fake-website-content">
+                    <div class="fake-login-form">
+                        <h3 style="text-align: center; margin-bottom: 12px; font-size: 14px;">Sign In</h3>
+                        <div class="form-group">
+                            <label>Email or phone number:</label>
+                            <input type="text" placeholder="Enter email or phone" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Password:</label>
+                            <input type="password" placeholder="Enter password" disabled>
+                        </div>
+                        <button class="fake-login-btn" disabled>Sign In</button>
+                        <p style="text-align: center; margin-top: 8px; font-size: 11px; color: #666;">Need help signing in?</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="closeModal('fakeWebsiteModal')">Close</button>
+        </div>
+    </div>
+
+    <div id="websiteInfoModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Fake Website Domain</h2>
+            <p><strong>Issue:</strong> The link goes to "nextfl1x-account-support.com" not "netflix.com"</p>
+            <p><strong>Wrong Domain:</strong> Uses "nextfl1x-account-support.com" instead of netflix.com</p>
+            <p><strong>Typosquatting:</strong> The "1" (number) replaces "i" to trick users</p>
+            <p><strong>Fake Login Form:</strong> Designed to steal your email and password</p>
+            <p><strong>Unsafe Connection:</strong> Real Netflix always uses secure domains</p>
+            <button onclick="closeModal('websiteInfoModal')">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        let groupsFound = new Set();
+
+        function clickWord(element, event) {
+            // Prevent event propagation
+            if(event && event.stopPropagation) {
+                event.stopPropagation();
+            }
+            
+            if(event === false) return; // Skip if called from parent
+            
+            const isSuspicious = element.dataset.suspicious === 'true';
+            const infoType = element.dataset.info;
+            const groupId = element.dataset.group;
+            
+            // Remove previous selections
+            document.querySelectorAll('.clickable-word.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Add selection
+            element.classList.add('selected');
+            
+            if(isSuspicious) {
+                // Award points only once per group
+                if(groupId && !groupsFound.has(groupId)) {
+                    groupsFound.add(groupId);
+                    updateScore();
+                    
+                    // Remove selection and add correct styling
+                    element.classList.remove('selected');
+                    
+                    // Highlight all words in the group with correct styling
+                    document.querySelectorAll(`[data-group="${groupId}"]`).forEach(el => {
+                        el.classList.add('correct');
+                    });
+                }
+                
+                // Open modal
+                openModal(infoType);
+            } else {
+                // Not suspicious - show incorrect
+                element.classList.add('incorrect');
+                setTimeout(() => {
+                    element.classList.remove('incorrect', 'selected');
+                }, 500);
+            }
+        }
+
+        function openFakeWebsiteModal() {
+            document.getElementById('fakeWebsiteModal').classList.add('show');
+        }
+
+        function openModal(modalId) {
+            if(modalId === 'email') {
+                document.getElementById('emailModal').classList.add('show');
+            } else if(modalId === 'billing') {
+                document.getElementById('billingModal').classList.add('show');
+            } else if(modalId === 'urgency') {
+                document.getElementById('urgencyModal').classList.add('show');
+            } else if(modalId === 'website') {
+                document.getElementById('websiteInfoModal').classList.add('show');
+            } else if(modalId === 'websiteInfo') {
+                document.getElementById('websiteInfoModal').classList.add('show');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function updateScore() {
+            document.getElementById('foundCount').textContent = groupsFound.size;
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>

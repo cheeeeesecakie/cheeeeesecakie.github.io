@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Display</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .image-container {
+            position: relative;
+            width: 960px;
+            height: 540px;
+        }
+        img {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        #mainImage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #overlayImage {
+            position: absolute;
+            top: 0;
+            right: -960px;
+            width: 100%;
+            height: 100%;
+            animation: slideInRight 0.5s ease-out forwards;
+        }
+
+        #clickIndicator {
+            position: absolute;
+            font-size: 40px;
+            color: rgba(255, 255, 0, 0.8);
+            pointer-events: none;
+            animation: bounce 1s ease-in-out infinite;
+            z-index: 15;
+        }
+
+        @keyframes slideInRight {
+            from {
+                right: -960px;
+            }
+            to {
+                right: 0;
+            }
+        }
+
+        @keyframes buttonPress {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.85);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(100, 150, 200, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(100, 150, 200, 0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .next-arrow {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(100, 150, 200, 0.8);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s, box-shadow 0.3s;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(100, 150, 200, 0.4);
+            opacity: 0;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .next-arrow.fade-in {
+            animation: fadeIn 0.6s ease-out forwards, pulse 2s ease-in-out 0.6s infinite;
+        }
+
+        .next-arrow:hover {
+            background: rgba(100, 150, 200, 1);
+            box-shadow: 0 6px 16px rgba(100, 150, 200, 0.6);
+        }
+        .next-arrow:active {
+            animation: buttonPress 0.3s ease-out;
+        }
+
+        .dialogue-box {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(25, 55, 109, 0.8), rgba(35, 75, 140, 0.8));
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 18px;
+            max-height: 180px;
+            overflow-y: auto;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(100, 150, 200, 0.6);
+            z-index: 10;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .dialogue-box.fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        #dialogueText {
+            min-height: 20px;
+        }
+
+        .image-map-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 5;
+        }
+
+        area {
+            cursor: pointer;
+        }
+
+        area:hover {
+            outline: 3px solid rgba(255, 255, 0, 0.8);
+        }
+
+        .black-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 2s ease-in-out;
+        }
+        .black-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <div id="blackScreen" class="black-screen"></div>
+        <img id="mainImage" src="calling.png" alt="Description of image">
+        <img id="overlayImage" src="" alt="Overlay" style="display: none;">
+        <div id="clickIndicator" style="display: none;">↓</div>
+        <div id="dialogueBox" class="dialogue-box" onclick="skipDialogueAnimation()">
+            <div id="speakerName" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: bold; margin-bottom: 10px; font-size: 20px; letter-spacing: 0.5px;">You</div>
+            <div id="dialogueText">Who is calling me at this time?</div>
+        </div>
+        <button id="nextButton" class="next-arrow" onclick="nextDialogue()">→</button>
+        
+        <!-- Image map for clickable area -->
+        <div id="imageMapContainer" class="image-map-container">
+            <img id="mappedImage" src="calling.png" usemap="#image-map" style="width: 100%; height: 100%;">
+            <map name="image-map">
+                <area id="clickArea" target="" alt="" title="" href="javascript:void(0);" coords="423,333,437,361,579,347,557,321" shape="poly" onclick="clickedArea()">
+            </map>
+        </div>
+    </div>
+
+    <script>
+        let currentDialogue = 0;
+        let isTyping = false;
+        let currentText = '';
+        let typingIndex = 0;
+        let typingSpeed = 35; // milliseconds per character
+        let typingTimeout = null;
+
+        const dialogues = [
+            { speaker: "You", text: "Who is calling me at this time?", image: "calling.png", type: "dialogue" },
+            { image: "calling.png", type: "clickable", coords: "423,333,437,361,579,347,557,321" },
+            { speaker: "Lily", text: "Hey, hey, are you awake?", image: "calling.png", overlayImage: "open2.png", type: "dialogue" },
+            { speaker: "You", text: "Huh, why are you calling me?", image: "o.png", type: "dialogue" },
+            { speaker: "Lily", text: "You asked me to remind you to go for your first shift today.", image: "smile.png", type: "dialogue" },
+            { speaker: "You", text: "(Oh, right, that)", image: "closedsmile.png", type: "dialogue" },
+            { speaker: "You", text: "(I signed up to volunteer for some scam helpline with her)", image: "closedsmile.png", type: "dialogue" },
+            { speaker: "You", text: "(Why did I take the midnight shift...)", image: "closedsmile.png", type: "dialogue" },
+            { speaker: "Lily", text: "I sent you a copy of the the manual that you lost. Make sure to actually look through it this time. Good luck!", image: "smile.png", type: "dialogue" },
+            { speaker: "You", text: "(She hung up, guess it's time to login to the system)", image: "phone.png", type: "dialogue" },
+            { image: "phone.png", type: "clickable", coords: "288,34,281,218,233,303,620,316,614,223,615,75,601,58,609,37", link: "actually_code.html" }
+        ];
+
+        // Start the intro when page loads
+        window.addEventListener('load', function() {
+            const blackScreen = document.getElementById('blackScreen');
+            
+            // Start fade out after a delay
+            setTimeout(() => {
+                blackScreen.classList.add('fade-out');
+                
+                // Remove black screen after fade completes
+                setTimeout(() => {
+                    blackScreen.style.display = 'none';
+                    // Start typing animation for first dialogue after intro
+                    const current = dialogues[currentDialogue];
+                    const dialogueBox = document.getElementById('dialogueBox');
+                    const nextButton = document.getElementById('nextButton');
+                    if (current.type === "dialogue") {
+                        dialogueBox.classList.add('fade-in');
+                        nextButton.classList.add('fade-in');
+                        document.getElementById('speakerName').textContent = current.speaker;
+                        typeText(current.text);
+                    }
+                }, 2000);
+            }, 1000);
+        });
+
+        function typeText(text, callback) {
+            const dialogueTextElement = document.getElementById('dialogueText');
+            isTyping = true;
+            currentText = text;
+            typingIndex = 0;
+            dialogueTextElement.textContent = '';
+
+            function type() {
+                if (typingIndex < currentText.length) {
+                    dialogueTextElement.textContent += currentText[typingIndex];
+                    typingIndex++;
+                    typingTimeout = setTimeout(type, typingSpeed);
+                } else {
+                    isTyping = false;
+                    if (callback) callback();
+                }
+            }
+
+            type();
+        }
+
+        function skipDialogueAnimation() {
+            if (isTyping) {
+                // Skip typing animation, show full text but don't advance dialogue
+                clearTimeout(typingTimeout);
+                const dialogueTextElement = document.getElementById('dialogueText');
+                dialogueTextElement.textContent = currentText;
+                isTyping = false;
+            }
+        }
+
+        function calculateCentroid(coords) {
+            const points = coords.split(',').map(Number);
+            let sumX = 0, sumY = 0;
+            for (let i = 0; i < points.length; i += 2) {
+                sumX += points[i];
+                sumY += points[i + 1];
+            }
+            return {
+                x: Math.round(sumX / (points.length / 2)),
+                y: Math.round(sumY / (points.length / 2))
+            };
+        }
+
+        function showClickIndicator(coords) {
+            const indicator = document.getElementById('clickIndicator');
+            const centroid = calculateCentroid(coords);
+            indicator.style.left = (centroid.x - 20) + 'px';
+            indicator.style.top = (centroid.y - 40) + 'px';
+            indicator.style.display = 'block';
+            indicator.style.animation = 'bounce 1s ease-in-out infinite';
+        }
+
+        function hideClickIndicator() {
+            const indicator = document.getElementById('clickIndicator');
+            indicator.style.animation = 'fadeOut 0.3s ease-out forwards';
+            setTimeout(() => {
+                indicator.style.display = 'none';
+                indicator.style.animation = 'bounce 1s ease-in-out infinite';
+            }, 300);
+        }
+
+        function nextDialogue() {
+            if (isTyping) {
+                // If still typing, complete the text immediately
+                const dialogueTextElement = document.getElementById('dialogueText');
+                dialogueTextElement.textContent = currentText;
+                isTyping = false;
+                return;
+            }
+
+            currentDialogue++;
+            if (currentDialogue >= dialogues.length) {
+                // Do nothing when reaching the end
+                return;
+            }
+            
+            updateDisplay();
+        }
+
+        function clickedArea() {
+            const current = dialogues[currentDialogue];
+            hideClickIndicator();
+            
+            // Check if this clickable area has a link
+            if (current.link) {
+                window.location.href = current.link;
+            } else {
+                nextDialogue();
+            }
+        }
+
+        function updateDisplay() {
+            const current = dialogues[currentDialogue];
+            const overlayImage = document.getElementById('overlayImage');
+            const dialogueBox = document.getElementById('dialogueBox');
+            const nextButton = document.getElementById('nextButton');
+            
+            document.getElementById('mainImage').src = current.image;
+
+            if (current.type === "clickable") {
+                // Hide dialogue box and next button
+                dialogueBox.style.display = 'none';
+                nextButton.style.display = 'none';
+                document.getElementById('mainImage').style.display = 'none';
+                overlayImage.style.display = 'none';
+                
+                // Update and show image map
+                document.getElementById('mappedImage').src = current.image;
+                document.getElementById('clickArea').coords = current.coords;
+                document.getElementById('imageMapContainer').style.display = 'block';
+                
+                // Show click indicator
+                showClickIndicator(current.coords);
+            } else {
+                // Show dialogue box and next button
+                dialogueBox.style.display = 'block';
+                dialogueBox.classList.remove('fade-in');
+                dialogueBox.style.opacity = '1';
+                nextButton.style.display = 'flex';
+                nextButton.classList.remove('fade-in');
+                nextButton.style.opacity = '1';
+                nextButton.style.animation = 'pulse 2s ease-in-out infinite';
+                document.getElementById('mainImage').style.display = 'block';
+                document.getElementById('imageMapContainer').style.display = 'none';
+                document.getElementById('clickIndicator').style.display = 'none';
+                
+                // Handle overlay image
+                if (current.overlayImage) {
+                    overlayImage.src = current.overlayImage;
+                    overlayImage.style.display = 'block';
+                    // Reset animation
+                    overlayImage.style.animation = 'none';
+                    setTimeout(() => {
+                        overlayImage.style.animation = 'slideInRight 0.5s ease-out forwards';
+                    }, 10);
+                } else {
+                    overlayImage.style.display = 'none';
+                }
+                
+                // Update dialogue content
+                document.getElementById('speakerName').textContent = current.speaker;
+                typeText(current.text);
+            }
+        }
+    </script>
+</body>
+</html>

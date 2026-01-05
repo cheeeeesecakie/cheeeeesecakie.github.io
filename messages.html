@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            display: flex;
+            width: 960px;
+            height: 540px;
+            background: white;
+            box-shadow: 0 5px 40px rgba(0,0,0,0.16);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        /* Contacts List */
+        .contacts-panel {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .contacts-header {
+            padding: 20px;
+            font-size: 24px;
+            font-weight: 700;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .contacts-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .contact-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .contact-item:hover {
+            background: #f5f5f5;
+        }
+
+        .contact-item.active {
+            background: #e8f4f8;
+            border-left: 4px solid #0084ff;
+        }
+
+        .contact-name {
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .contact-preview {
+            font-size: 12px;
+            color: #65676b;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Chat Area */
+        .chat-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-info h2 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .chat-header-info p {
+            font-size: 12px;
+            color: #65676b;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .message.received {
+            justify-content: flex-start;
+        }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 60%;
+            padding: 8px 12px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .received .message-content {
+            background: #e4e6eb;
+            color: #000;
+        }
+
+        .sent .message-content {
+            background: #0084ff;
+            color: white;
+        }
+
+        .message-attachment {
+            max-width: 60%;
+            padding: 10px;
+        }
+
+        .pdf-file {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .pdf-file:hover {
+            background: #e8e8e8;
+        }
+
+        .pdf-icon {
+            width: 35px;
+            height: 45px;
+            background: #ff4444;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .pdf-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .pdf-name {
+            font-weight: 500;
+            color: #000;
+            font-size: 12px;
+        }
+
+        .pdf-size {
+            font-size: 11px;
+            color: #65676b;
+        }
+
+        .chat-input-area {
+            padding: 12px 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: #0084ff;
+        }
+
+        .send-btn {
+            background: #0084ff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #0073e6;
+        }
+
+        /* PDF Modal */
+        .pdf-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pdf-modal.active {
+            display: flex;
+        }
+
+        .pdf-modal-content {
+            background: white;
+            width: 90%;
+            max-width: 800px;
+            height: 90vh;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 5px 40px rgba(0,0,0,0.16);
+        }
+
+        .pdf-modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pdf-modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .pdf-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #65676b;
+        }
+
+        .pdf-viewer {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f9f9f9;
+        }
+
+        .pdf-page {
+            background: white;
+            padding: 40px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+
+        .pdf-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #000;
+        }
+
+        .pdf-section {
+            margin-bottom: 25px;
+        }
+
+        .pdf-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #000;
+        }
+
+        .pdf-section-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .pdf-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .pdf-list li {
+            padding: 8px 0 8px 20px;
+            position: relative;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .pdf-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #0084ff;
+            font-weight: bold;
+        }
+
+        /* No chat selected */
+        .no-chat-selected {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #65676b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Contacts List -->
+        <div class="contacts-panel">
+            <div class="contacts-header">Messages</div>
+            <div class="contacts-list">
+                <div class="contact-item active" onclick="selectContact(0, this)">
+                    <div class="contact-name">Lily</div>
+                    <div class="contact-preview">manual_scamhelpline.pdf</div>
+                </div>
+                <div class="contact-item" onclick="selectContact(1, this)">
+                    <div class="contact-name">Manager</div>
+                    <div class="contact-preview">Check in when you arrive...</div>
+                </div>
+                <div class="contact-item" onclick="selectContact(2, this)">
+                    <div class="contact-name">Training Team</div>
+                    <div class="contact-preview">Welcome to the team! Here's...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Panel -->
+        <div class="chat-panel">
+            <div id="chatHeader" class="chat-header">
+                <div class="chat-header-info">
+                    <h2>Select a contact</h2>
+                </div>
+            </div>
+
+            <div id="chatMessages" class="chat-messages">
+                <div class="no-chat-selected">Select a contact to view messages</div>
+            </div>
+
+            <div id="chatInputArea" class="chat-input-area" style="display: none;">
+                <input type="text" class="chat-input" placeholder="Message...">
+                <button class="send-btn">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Modal -->
+    <div id="pdfModal" class="pdf-modal">
+        <div class="pdf-modal-content">
+            <div class="pdf-modal-header">
+                <h2>Scam Helpline Manual</h2>
+                <button class="pdf-close-btn" onclick="closePdfModal()">✕</button>
+            </div>
+            <div class="pdf-viewer">
+                <div class="pdf-page">
+                    <div class="pdf-title">SCAM HELPLINE MANUAL</div>
+                    
+                    <div class="pdf-section">
+                        <div class="pdf-section-title">1. Introduction</div>
+                        <div class="pdf-section-content">
+                            Welcome to the Scam Helpline team! This manual provides comprehensive guidelines for responding to calls and assisting victims of scams. Our mission is to help people protect themselves and understand common fraud tactics.
+                        </div>
+                    </div>
+
+                    <div class="pdf-section">
+                        <div class="pdf-section-title">2. Common Scam Types</div>
+                        <ul class="pdf-list">
+                            <li><strong>Phishing Scams:</strong> Fraudulent emails or texts requesting personal information</li>
+                            <li><strong>Tech Support Scams:</strong> False claims of computer viruses or technical issues</li>
+                            <li><strong>Romance Scams:</strong> Building relationships to extract money or personal information</li>
+                            <li><strong>Lottery/Prize Scams:</strong> Claiming the victim has won something they didn't enter</li>
+                            <li><strong>IRS/Tax Scams:</strong> Impersonating tax authorities demanding immediate payment</li>
+                        </ul>
+                    </div>
+
+                    <div class="pdf-section">
+                        <div class="pdf-section-title">3. Call Handling Procedures</div>
+                        <ul class="pdf-list">
+                            <li>Listen empathetically to the caller's situation</li>
+                            <li>Ask clarifying questions to understand the scam</li>
+                            <li>Provide information about the specific scam type</li>
+                            <li>Advise on immediate protective steps</li>
+                            <li>Direct to appropriate authorities if needed</li>
+                        </ul>
+                    </div>
+
+                    <div class="pdf-section">
+                        <div class="pdf-section-title">4. Resources & Support</div>
+                        <div class="pdf-section-content">
+                            Familiarize yourself with local law enforcement contacts, FTC guidelines, and support resources for victims. Keep detailed notes on each call for follow-up and reporting purposes.
+                        </div>
+                    </div>
+
+                    <div class="pdf-section">
+                        <div class="pdf-section-title">5. Code of Conduct</div>
+                        <ul class="pdf-list">
+                            <li>Maintain confidentiality of all caller information</li>
+                            <li>Remain professional and patient with all callers</li>
+                            <li>Never pressure or judge victims</li>
+                            <li>Follow all company protocols and compliance guidelines</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const contacts = [
+            {
+                name: "Lily",
+                status: "online",
+                messages: [
+                    { type: "received", text: "Hey! Here's the manual for the scam helpline. Make sure to read through it!" },
+                    { type: "received", text: "It covers all the common scams you'll encounter and how to handle calls." },
+                    { type: "received", attachment: "manual_scamhelpline.pdf", attachmentSize: "2.4 MB" },
+                    { type: "received", text: "Good luck on your first shift! You'll do great 😊" }
+                ]
+            },
+            {
+                name: "Manager",
+                status: "online",
+                messages: [
+                    { type: "received", text: "Welcome to the team!" },
+                    { type: "received", text: "Check in when you arrive at the office." },
+                    { type: "sent", text: "Thanks! I'll be there soon." }
+                ]
+            },
+            {
+                name: "Training Team",
+                status: "away",
+                messages: [
+                    { type: "received", text: "Welcome to the team! Here's the link to our training portal." },
+                    { type: "received", text: "Please complete all modules before your first shift." }
+                ]
+            }
+        ];
+
+        function selectContact(index, element) {
+            // Update active contact
+            document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            const contact = contacts[index];
+            const chatHeader = document.getElementById('chatHeader');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInputArea = document.getElementById('chatInputArea');
+
+            // Update header
+            chatHeader.innerHTML = `
+                <div class="chat-header-info">
+                    <h2>${contact.name}</h2>
+                    <p>${contact.status}</p>
+                </div>
+            `;
+
+            // Update messages
+            chatMessages.innerHTML = '';
+            contact.messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.type}`;
+                
+                if (msg.attachment) {
+                    messageDiv.innerHTML = `
+                        <div class="message-attachment">
+                            <div class="pdf-file" onclick="openPdfModal()">
+                                <div class="pdf-icon">PDF</div>
+                                <div class="pdf-info">
+                                    <div class="pdf-name">${msg.attachment}</div>
+                                    <div class="pdf-size">${msg.attachmentSize}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    messageDiv.innerHTML = `<div class="message-content">${msg.text}</div>`;
+                }
+                
+                chatMessages.appendChild(messageDiv);
+            });
+
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Show input area
+            chatInputArea.style.display = 'flex';
+        }
+
+        function openPdfModal() {
+            document.getElementById('pdfModal').classList.add('active');
+        }
+
+        function closePdfModal() {
+            document.getElementById('pdfModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('pdfModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePdfModal();
+            }
+        });
+    </script>
+</body>
+</html>

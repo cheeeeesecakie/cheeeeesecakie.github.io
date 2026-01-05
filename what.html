@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Position Relative Layout</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            position: relative;
+            width: 960px;
+            height: 540px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .placeholder {
+            background-color: #e0e0e0;
+            border: 1px dashed #999;
+            padding: 15px;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .placeholder h3 {
+            margin: 0 0 10px 0;
+            color: #666;
+        }
+
+        .placeholder p {
+            margin: 0;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .placeholder:nth-child(1) {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: calc(100% - 40px);
+            height: 120px;
+        }
+
+        .placeholder:nth-child(2) {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 120px;
+        }
+
+        .placeholder:nth-child(3) {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: calc(100% - 40px);
+            height: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="placeholder">
+            <h3>Header/Title Area</h3>
+            <p>Place header content here</p>
+        </div>
+        <div class="placeholder">
+            <h3>Main Content Area</h3>
+            <p>Place main content here</p>
+        </div>
+        <div class="placeholder">
+            <h3>Footer/Additional Area</h3>
+            <p>Place footer content here</p>
+        </div>
+    </div>
+
+    <audio id="ambientAudio" autoplay loop style="display:none;">
+        <source src="ringing.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        function playAmbientSound() {
+            const audio = document.getElementById('ambientAudio');
+            audio.muted = false;
+            audio.play().catch((error) => {
+                console.log("Autoplay started");
+            });
+        }
+
+        // Play on page load
+        window.addEventListener('load', playAmbientSound);
+        
+        // Fallback: play on first user interaction
+        document.addEventListener('', playAmbientSound, { once: true });
+        document.addEventListener('keydown', playAmbientSound, { once: true });
+    </script>
+</body>
+</html>
