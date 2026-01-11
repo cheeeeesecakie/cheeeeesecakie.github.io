@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case-3: AI Sextortion Scam</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        .container {
+            width: 960px;
+            height: 540px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #e50914;
+            border-bottom: 3px solid #e50914;
+            padding-bottom: 10px;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        .case-info {
+            margin: 10px 0;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #e50914;
+            font-size: 16px;
+        }
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
+        .value {
+            margin-left: 10px;
+        }
+
+        /* SMS Conversation Styling */
+        .sms-section {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .sms-header {
+            background-color: #e50914;
+            color: white;
+            padding: 10px;
+            margin: -15px -15px 15px -15px;
+            border-radius: 5px 5px 0 0;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .sms-content {
+            background-color: white;
+            padding: 15px;
+            border-radius: 3px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .conversation-thread {
+            background: linear-gradient(to bottom, #f5f5f5 0%, #fff 100%);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.sender {
+            justify-content: flex-end;
+        }
+
+        .message-header {
+            font-size: 10px;
+            color: #999;
+            margin-bottom: 4px;
+            width: 100%;
+            padding: 0 6px;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            font-size: 12px;
+            line-height: 1.5;
+            transition: all 0.2s;
+        }
+
+        .message.sender .message-bubble {
+            background-color: #d4f4dd;
+            border-bottom-right-radius: 3px;
+            color: #1b5e20;
+        }
+
+        .message.receiver .message-bubble {
+            background-color: #e3f2fd;
+            border-bottom-left-radius: 3px;
+            color: #0d47a1;
+        }
+
+        .message-time {
+            font-size: 10px;
+            color: #999;
+            margin: 0 6px;
+            align-self: flex-end;
+        }
+
+        .question-section {
+            background-color: #f9f9f9;
+            border: 2px solid #e50914;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .question-section h3 {
+            color: #e50914;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .question-text {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .options {
+            margin-bottom: 12px;
+        }
+
+        .option {
+            margin-bottom: 8px;
+            padding: 6px;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+        }
+
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .option input[type="radio"],
+        .option input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .option label {
+            cursor: pointer;
+            color: #555;
+            font-size: 12px;
+        }
+
+        /* Unified Button Styling */
+        .submit-btn {
+            background-color: #e50914;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background-color: #c70812;
+        }
+
+        .submit-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            font-size: 12px;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.correct {
+            background-color: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .result.incorrect {
+            background-color: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .completion-status {
+            background-color: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #856404;
+        }
+
+        .completion-status.all-done {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .completion-modal {
+            display: none;
+            position: absolute;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 960px;
+            height: 540px;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .completion-modal.show {
+            display: flex;
+        }
+
+        .completion-modal-content {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: 3px solid #155724;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+        }
+
+        .completion-modal-content h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .completion-modal-content p {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: white;
+            line-height: 1.6;
+        }
+
+        .completion-modal-content .emoji {
+            font-size: 60px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .completion-modal-button {
+            background-color: white;
+            color: #28a745;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .completion-modal-button:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        /* AI Image Modal and Question Styling */
+        .message-image {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 8px;
+            margin: 5px 0;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .message-image:hover {
+            transform: scale(1.05);
+        }
+
+        .ai-image-modal {
+    display: none;
+    position: absolute;
+    z-index: 3000;
+    left: 0;
+    top: 0;
+    width: 960px;
+    height: 540px;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+.ai-image-modal.show {
+    display: flex;
+}
+
+        .ai-image-modal-content {
+    background-color: white;
+    border-radius: 12px;
+    padding: 15px;
+    max-width: 500px;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+        .ai-image-modal-header {
+            color: #e50914;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .ai-image-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .ai-image-display img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .ai-image-close {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        .ai-image-close button {
+            background-color: #999;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .ai-image-close button:hover {
+            background-color: #666;
+        }
+
+        .ai-identification-section {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .ai-identification-section h3 {
+            color: #e50914;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .ai-question-text {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .ai-options {
+            margin-bottom: 12px;
+        }
+
+        .ai-option {
+            margin-bottom: 8px;
+            padding: 6px;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+        }
+
+        .ai-option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .ai-option input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .ai-option label {
+            cursor: pointer;
+            color: #555;
+            font-size: 12px;
+        }
+
+        .ai-submit-btn {
+            background-color: #e50914;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        .ai-submit-btn:hover:not(:disabled) {
+            background-color: #c70812;
+        }
+
+        .ai-submit-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .ai-result {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            font-size: 12px;
+        }
+
+        .ai-result.show {
+            display: block;
+        }
+
+        .ai-result.correct {
+            background-color: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .ai-result.incorrect {
+            background-color: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Case-3: Sextortion</h1>
+        
+        <div class="case-info">
+            <div><span class="label">Victim:</span><span class="value">Sarah</span></div>
+            <div><span class="label">Platform:</span><span class="value">Text Messages</span></div>
+            <div><span class="label">Details:</span><span class="value"> I received messages from an unknown number claiming to have my explicit images and threatening to share them unless money is paid.</span></div>
+        </div>
+
+        <div id="completionModal" class="completion-modal">
+            <div class="completion-modal-content">
+                <span class="emoji">✅</span>
+                <h2>Case Completed!</h2>
+                <p>Excellent work! You successfully identified all red flags in this sextortion scam and provided all correct answers.</p>
+                <p>You're now better equipped to recognize AI sextortion threats!</p>
+                <button class="submit-btn" onclick="backToCases()">Back to Cases</button>
+            </div>
+        </div>
+
+        <div id="completionStatus" class="completion-status">
+            ⚠️ Complete all questions to finish the case: Red Flags ❌ | Response ❌ | Verification ❌ | Prevention ❌
+        </div>
+
+        <!-- SMS Conversation Section -->
+        <div class="sms-section">
+            <div class="sms-header">💬 Text Message Conversation</div>
+            <div class="sms-content">
+                <div class="conversation-thread">
+                    <div class="message receiver">
+                        <div class="message-bubble">Hi Sarah.</div>
+                    </div>
+                    
+                    <div class="message sender">
+                        <div class="message-bubble">Who is this?</div>
+                    </div>
+                    
+                    <div class="message receiver">
+                        <div class="message-bubble">I have some images of you. You won't like them.</div>
+                    </div>
+                    
+                    <div class="message sender">
+                        <div class="message-bubble">What images?</div>
+                    </div>
+                    
+                    <div class="message receiver">
+                        <div class="message-bubble">
+                            <img src="womanai.jpg" alt="AI-generated image" class="message-image" onclick="openAIImageModal()">
+                        </div>
+                    </div>
+                    
+                    <div class="message receiver">
+                        <div class="message-bubble">This was made using AI. Looks real enough, right?</div>
+                    </div>
+                    
+                    <div class="message sender">
+                        <div class="message-bubble">That's not real. I never took anything like that.</div>
+                    </div>
+                    
+                    <div class="message receiver">
+                        <div class="message-bubble">Doesn't matter. People will believe it.</div>
+                    </div>
+                    
+                    <div class="message receiver">
+                        <div class="message-bubble">If you don't want this sent to your followers, send $200 now.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question 1: Red Flags -->
+        <div class="question-section">
+            <h3>🚩 Question 1: Identify the Red Flags</h3>
+            <p class="question-text">What are the main red flags in this sextortion attempt?</p>
+            <div class="options">
+                <div class="option">
+                    <input type="radio" id="flag1" name="redflags" value="correct">
+                    <label for="flag1">Threats to share fake images unless money is paid</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="flag2" name="redflags" value="wrong">
+                    <label for="flag2">Polite greeting and introduction</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="flag3" name="redflags" value="wrong">
+                    <label for="flag3">Offering to meet in person</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="flag4" name="redflags" value="correct">
+                    <label for="flag4">Unknown number and emotional manipulation</label>
+                </div>
+            </div>
+            <button class="submit-btn" id="redFlagsBtn" onclick="checkRedFlags()" disabled>Submit Answer</button>
+            <div id="redFlagsResult" class="result"></div>
+        </div>
+
+        <!-- Question 2: What Should Sarah Do? -->
+        <div class="question-section">
+            <h3>💡 Question 2: What Should Sarah Do?</h3>
+            <p class="question-text">What is the best response to this sextortion attempt? (Select all that apply)</p>
+            <div class="options">
+                <div class="option">
+                    <input type="checkbox" id="response1" class="response" value="wrong">
+                    <label for="response1">Pay the $200 to make the threat go away</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="response2" class="response" value="correct">
+                    <label for="response2">Block the number immediately</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="response3" class="response" value="correct">
+                    <label for="response3">Report the messages to the platform and police</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="response4" class="response" value="wrong">
+                    <label for="response4">Reply and engage with the scammer to get information</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="response5" class="response" value="correct">
+                    <label for="response5">Inform trusted friends or family about the threat</label>
+                </div>
+            </div>
+            <button class="submit-btn" id="responseBtn" onclick="checkResponse()" disabled>Submit Answer</button>
+            <div id="responseResult" class="result"></div>
+        </div>
+
+        <!-- Question 3: Verification Method -->
+        <div class="question-section">
+            <h3>✅ Question 3: How Can Sarah Verify This Is a Scam?</h3>
+            <p class="question-text">Which statement is true about verifying this is a scam?</p>
+            <div class="options">
+                <div class="option">
+                    <input type="radio" id="verify1" name="verification" value="correct">
+                    <label for="verify1">Real intimate images would require her actual consent and participation</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="verify2" name="verification" value="wrong">
+                    <label for="verify2">The scammer's confidence means the images are real</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="verify3" name="verification" value="wrong">
+                    <label for="verify3">She should pay to verify if they will actually send the images</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="verify4" name="verification" value="correct">
+                    <label for="verify4">AI-generated images can be created without any real photos</label>
+                </div>
+            </div>
+            <button class="submit-btn" id="verificationBtn" onclick="checkVerification()" disabled>Submit Answer</button>
+            <div id="verificationResult" class="result"></div>
+        </div>
+
+        <!-- Question 4: Prevention -->
+        <div class="question-section">
+            <h3>🛡️ Question 4: How to Prevent Sextortion?</h3>
+            <p class="question-text">Which practices help prevent becoming a sextortion victim? (Select all that apply)</p>
+            <div class="options">
+                <div class="option">
+                    <input type="checkbox" id="prevent1" class="prevention" value="correct">
+                    <label for="prevent1">Never send intimate images to anyone, even people you trust</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="prevent2" class="prevention" value="correct">
+                    <label for="prevent2">Keep social media privacy settings tight and limit followers</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="prevent3" class="prevention" value="wrong">
+                    <label for="prevent3">Share personal photos freely to appear more authentic online</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="prevent4" class="prevention" value="correct">
+                    <label for="prevent4">Be cautious of unknown contacts asking personal questions</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="prevent5" class="prevention" value="correct">
+                    <label for="prevent5">Educate yourself about AI deepfakes and their threats</label>
+                </div>
+            </div>
+            <button class="submit-btn" id="preventionBtn" onclick="checkPrevention()" disabled>Submit Answer</button>
+            <div id="preventionResult" class="result"></div>
+        </div>
+    </div>
+
+    <!-- AI Image Identification Modal -->
+    <div id="aiImageModal" class="ai-image-modal">
+        <div class="ai-image-modal-content">
+            <div class="ai-image-close">
+                <button onclick="closeAIImageModal()">Close</button>
+            </div>
+            
+            <div class="ai-image-modal-header">🖼️ Is This AI-Generated?</div>
+            
+            <div class="ai-image-display">
+                <img src="womanai.jpg" alt="AI-generated image">
+                <p style="color: #666; font-size: 12px; margin-top: 10px;">Click on the image to examine it more closely</p>
+            </div>
+
+            <div class="ai-identification-section">
+                <h3>Identify AI-Generated Image Characteristics</h3>
+                <p class="ai-question-text">Which of these are signs this image might be AI-generated?</p>
+                
+                <div class="ai-options">
+                    <div class="ai-option">
+                        <input type="checkbox" id="aiSign1" class="ai-sign" value="correct">
+                        <label for="aiSign1">Unnatural facial features or asymmetry (eyes, ears, face shape)</label>
+                    </div>
+                    <div class="ai-option">
+                        <input type="checkbox" id="aiSign2" class="ai-sign" value="correct">
+                        <label for="aiSign2">Heavily blurred background</label>
+                    </div>
+                   
+                    <div class="ai-option">
+                        <input type="checkbox" id="aiSign4" class="ai-sign" value="wrong">
+                        <label for="aiSign4">Professional lighting and perfect composition</label>
+                    </div>
+
+                    <div class="ai-option">
+                        <input type="checkbox" id="aiSign5" class="ai-sign" value="correct">
+                        <label for="aiSign5">Unrealistic or morphed body proportions</label>
+                    </div>
+                    <div class="ai-option">
+                        <input type="checkbox" id="aiSign6" class="ai-sign" value="wrong">
+                        <label for="aiSign6">High resolution and clear image quality</label>
+                    </div>
+                </div>
+
+                <button class="ai-submit-btn" id="aiIdentifyBtn" onclick="checkAIIdentification()" disabled>Check Answer</button>
+                <div id="aiIdentifyResult" class="ai-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let correctAnswers = {
+            redflags: 0,
+            response: 0,
+            verification: 0,
+            prevention: 0
+        };
+
+        let aiImageAnswered = false;
+        let aiImageCorrect = false;
+
+        function checkRedFlags() {
+            const selected = document.querySelector('input[name="redflags"]:checked');
+            const result = document.getElementById('redFlagsResult');
+            
+            if (!selected) {
+                result.innerHTML = '⚠️ Please select an answer';
+                result.classList.add('show');
+                return;
+            }
+            
+            result.classList.add('show');
+            if (selected.value === 'correct') {
+                result.innerHTML = '✓ <strong>Correct!</strong> Threats and emotional manipulation are key red flags.';
+                result.classList.add('correct');
+                result.classList.remove('incorrect');
+                correctAnswers.redflags = 1;
+            } else {
+                result.innerHTML = '❌ Incorrect. The correct answer is threats and emotional manipulation.';
+                result.classList.add('incorrect');
+                result.classList.remove('correct');
+                correctAnswers.redflags = 0;
+            }
+            updateCompletion();
+        }
+
+        function checkResponse() {
+            const selected = document.querySelectorAll('input.response:checked');
+            const result = document.getElementById('responseResult');
+            
+            if (selected.length === 0) {
+                result.innerHTML = '⚠️ Please select at least one answer';
+                result.classList.add('show');
+                return;
+            }
+            
+            let correct = true;
+            let selectedValues = Array.from(selected).map(el => el.value);
+            
+            // Check if all correct answers are selected and no wrong answers
+            if (selectedValues.includes('wrong') || !selectedValues.includes('correct')) {
+                correct = false;
+            }
+            
+            result.classList.add('show');
+            if (correct) {
+                result.innerHTML = '✓ <strong>Correct!</strong> Block, report to authorities, and inform trusted people.';
+                result.classList.add('correct');
+                result.classList.remove('incorrect');
+                correctAnswers.response = 1;
+            } else {
+                result.innerHTML = '❌ Incorrect. Never pay scammers - block, report, and seek help instead.';
+                result.classList.add('incorrect');
+                result.classList.remove('correct');
+                correctAnswers.response = 0;
+            }
+            updateCompletion();
+        }
+
+        function checkVerification() {
+            const selected = document.querySelector('input[name="verification"]:checked');
+            const result = document.getElementById('verificationResult');
+            
+            if (!selected) {
+                result.innerHTML = '⚠️ Please select an answer';
+                result.classList.add('show');
+                return;
+            }
+            
+            result.classList.add('show');
+            if (selected.value === 'correct') {
+                result.innerHTML = '✓ <strong>Correct!</strong> Real images require participation, and AI can create fake ones.';
+                result.classList.add('correct');
+                result.classList.remove('incorrect');
+                correctAnswers.verification = 1;
+            } else {
+                result.innerHTML = '❌ Incorrect. AI-generated images don\'t need real photos - they\'re completely fake.';
+                result.classList.add('incorrect');
+                result.classList.remove('correct');
+                correctAnswers.verification = 0;
+            }
+            updateCompletion();
+        }
+
+        function checkPrevention() {
+            const selected = document.querySelectorAll('input.prevention:checked');
+            const result = document.getElementById('preventionResult');
+            
+            if (selected.length === 0) {
+                result.innerHTML = '⚠️ Please select at least one answer';
+                result.classList.add('show');
+                return;
+            }
+            
+            let correct = true;
+            let selectedValues = Array.from(selected).map(el => el.value);
+            
+            // Check if no wrong answers are selected
+            if (selectedValues.includes('wrong')) {
+                correct = false;
+            }
+            
+            result.classList.add('show');
+            if (correct) {
+                result.innerHTML = '✓ <strong>Correct!</strong> These are all effective prevention strategies.';
+                result.classList.add('correct');
+                result.classList.remove('incorrect');
+                correctAnswers.prevention = 1;
+            } else {
+                result.innerHTML = '❌ Incorrect. Avoid sharing intimate content and be cautious of unknown contacts.';
+                result.classList.add('incorrect');
+                result.classList.remove('correct');
+                correctAnswers.prevention = 0;
+            }
+            updateCompletion();
+        }
+
+        function updateCompletion() {
+            const totalCorrect = Object.values(correctAnswers).reduce((a, b) => a + b, 0);
+            const statusEl = document.getElementById('completionStatus');
+            
+            const redFlagsStatus = correctAnswers.redflags ? '✓' : '❌';
+            const responseStatus = correctAnswers.response ? '✓' : '❌';
+            const verificationStatus = correctAnswers.verification ? '✓' : '❌';
+            const preventionStatus = correctAnswers.prevention ? '✓' : '❌';
+            
+            statusEl.innerHTML = `📋 Complete all questions to finish: Red Flags ${redFlagsStatus} | Response ${responseStatus} | Verification ${verificationStatus} | Prevention ${preventionStatus}`;
+            
+            if (totalCorrect === 4) {
+                statusEl.classList.add('all-done');
+                statusEl.innerHTML = '✅ All questions completed! Case finished successfully.';
+                setTimeout(() => {
+                    document.getElementById('completionModal').classList.add('show');
+                }, 500);
+            }
+        }
+
+        function backToCases() {
+            window.location.href = 'cases.html';
+        }
+
+        function openAIImageModal() {
+            document.getElementById('aiImageModal').classList.add('show');
+        }
+
+        function closeAIImageModal() {
+            document.getElementById('aiImageModal').classList.remove('show');
+        }
+
+        function checkAIIdentification() {
+            const selected = document.querySelectorAll('input.ai-sign:checked');
+            const resultDiv = document.getElementById('aiIdentifyResult');
+            
+            if (selected.length === 0) {
+                resultDiv.innerHTML = '⚠️ Please select at least one option';
+                resultDiv.classList.add('show', 'incorrect');
+                return;
+            }
+            
+            let correct = true;
+            let selectedValues = Array.from(selected).map(el => el.value);
+            
+            // Must select options 1, 2, 3, 5 (correct) and NOT select 4, 6 (wrong)
+            if (selectedValues.includes('wrong') || selectedValues.length !== 3) {
+                correct = false;
+            }
+            
+            resultDiv.classList.remove('correct', 'incorrect');
+            resultDiv.classList.add('show');
+            
+            if (correct) {
+                resultDiv.innerHTML = '✓ <strong>Correct!</strong> AI-generated images often have telltale signs like unnatural facial features, strange hands/fingers, odd text, or unrealistic proportions. Professional quality and lighting alone don\'t prove authenticity.';
+                resultDiv.classList.add('correct');
+                aiImageCorrect = true;
+            } else {
+                resultDiv.innerHTML = '❌ Incorrect. Look for unnatural features like asymmetrical faces, morphed hands, strange text/logos, and unrealistic body proportions. Professional quality doesn\'t mean it\'s real.';
+                resultDiv.classList.add('incorrect');
+                aiImageCorrect = false;
+            }
+            
+            aiImageAnswered = true;
+        }
+
+        // Enable/disable buttons based on selection
+        document.addEventListener('change', function(event) {
+            // Red Flags question
+            if (event.target.name === 'redflags') {
+                document.getElementById('redFlagsBtn').disabled = false;
+            }
+            
+            // Verification question
+            if (event.target.name === 'verification') {
+                document.getElementById('verificationBtn').disabled = false;
+            }
+            
+            // Response checkboxes
+            if (event.target.classList.contains('response')) {
+                const anyChecked = document.querySelectorAll('input.response:checked').length > 0;
+                document.getElementById('responseBtn').disabled = !anyChecked;
+            }
+            
+            // Prevention checkboxes
+            if (event.target.classList.contains('prevention')) {
+                const anyChecked = document.querySelectorAll('input.prevention:checked').length > 0;
+                document.getElementById('preventionBtn').disabled = !anyChecked;
+            }
+
+            // AI image identification checkboxes
+            if (event.target.classList.contains('ai-sign')) {
+                const anyChecked = document.querySelectorAll('input.ai-sign:checked').length > 0;
+                document.getElementById('aiIdentifyBtn').disabled = !anyChecked;
+            }
+        });
+
+        // Close modal on background click
+        document.addEventListener('click', function(event) {
+            if (event.target.id === 'aiImageModal') {
+                closeAIImageModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -87,6 +87,7 @@
             align-items: center;
             justify-content: center;
             height: 100%;
+            position: relative;
         }
 
         .case-card:hover {
@@ -94,6 +95,30 @@
             box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
             background: linear-gradient(135deg, #d5dbdb, #a6acaf);
             border-color: #27ae60;
+        }
+
+        .case-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .case-card.disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+            border-color: #95a5a6;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #27ae60;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
         }
 
         .case-icon {
@@ -135,23 +160,25 @@
         </div>
 
         <div class="content">
-            <a href="case1.html" style="text-decoration: none;">
-                <div class="case-card">
+            <div style="text-decoration: none;">
+                <div class="case-card disabled">
+                    <div class="status-badge">✓ Completed</div>
                     <div class="case-icon">📋</div>
                     <h2>Case 1</h2>
                     <p>Daniel - Netflix Email</p>
                 </div>
-            </a>
+            </div>
 
             <a href="" style="text-decoration: none;">
-                <div class="case-card">
+                <div class="case-card disabled">
+                    <div class="status-badge">✓ Completed</div>
                     <div class="case-icon">📋</div>
                     <h2>Case 2</h2>
                     <p>Linda - SMS & Call From Relative</p>
                 </div>
             </a>
 
-            <a href="" style="text-decoration: none;">
+            <a href="case3.html" style="text-decoration: none;">
                 <div class="case-card">
                     <div class="case-icon">📋</div>
                     <h2>Case 3</h2>

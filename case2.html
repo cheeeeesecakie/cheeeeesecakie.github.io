@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case-2: SMS & Call From Relative</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        .container {
+            width: 960px;
+            height: 540px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #e50914;
+            border-bottom: 3px solid #e50914;
+            padding-bottom: 10px;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        .case-info {
+            margin: 10px 0;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #e50914;
+            font-size: 16px;
+        }
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
+        .value {
+            margin-left: 10px;
+        }
+        .score-display {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* SMS Conversation Styling */
+        .sms-section {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .sms-header {
+            background-color: #e50914;
+            color: white;
+            padding: 10px;
+            margin: -15px -15px 15px -15px;
+            border-radius: 5px 5px 0 0;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .sms-content {
+            background-color: white;
+            padding: 15px;
+            border-radius: 3px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .conversation-thread {
+            background: linear-gradient(to bottom, #f5f5f5 0%, #fff 100%);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.sender {
+            justify-content: flex-end;
+        }
+
+        .message-header {
+            font-size: 10px;
+            color: #999;
+            margin-bottom: 4px;
+            width: 100%;
+            padding: 0 6px;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            font-size: 12px;
+            line-height: 1.5;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .message.sender .message-bubble {
+            background-color: #d4f4dd;
+            border-bottom-right-radius: 3px;
+            color: #1b5e20;
+        }
+
+        .message.receiver .message-bubble {
+            background-color: #e3f2fd;
+            border-bottom-left-radius: 3px;
+            color: #0d47a1;
+        }
+
+        .message-bubble:hover {
+            outline: 2px dashed #999;
+        }
+
+        .message-bubble.correct {
+            outline: 3px solid #4CAF50;
+            background-color: #c8e6c9 !important;
+        }
+
+        .message-bubble.incorrect {
+            outline: 3px solid #f44336;
+            background-color: #ffcdd2 !important;
+        }
+
+        .message-time {
+            font-size: 10px;
+            color: #999;
+            margin: 0 6px;
+            align-self: flex-end;
+        }
+
+        .clickable-word {
+            cursor: pointer;
+            padding: 2px 4px;
+            transition: all 0.2s;
+            border-radius: 2px;
+            display: inline;
+        }
+
+        .clickable-word:hover {
+            outline: 2px dashed #999;
+        }
+
+        .clickable-word.correct {
+            outline: 3px solid #4CAF50;
+            background-color: #c8e6c9;
+        }
+
+        .audio-section {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: 5px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .audio-section h3 {
+            color: #f57c00;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .audio-section p {
+            color: #555;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .audio-section audio {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .audio-placeholder {
+            color: #d84315;
+            font-size: 11px;
+            font-weight: bold;
+            background-color: #ffebee;
+            padding: 6px;
+            border-radius: 3px;
+            border-left: 3px solid #d84315;
+            margin-bottom: 10px;
+        }
+
+        .audio-question {
+            background-color: #f9f9f9;
+            border: 1px solid #ff9800;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .audio-question p {
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .audio-options {
+            margin-left: 10px;
+        }
+
+        .audio-option {
+            margin-bottom: 6px;
+            padding: 4px;
+            cursor: pointer;
+        }
+
+        .audio-option input[type="checkbox"] {
+            margin-right: 6px;
+            cursor: pointer;
+        }
+
+        .audio-option label {
+            cursor: pointer;
+            font-size: 11px;
+            color: #555;
+        }
+
+        .audio-submit {
+            background-color: #ff9800;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .audio-submit:hover {
+            background-color: #f57c00;
+        }
+
+        .audio-result {
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 4px;
+            display: none;
+            font-size: 11px;
+        }
+
+        .audio-result.show {
+            display: block;
+        }
+
+        .audio-result.correct {
+            background-color: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+        }
+
+        .audio-result.incorrect {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .question-section {
+            background-color: #f9f9f9;
+            border: 2px solid #e50914;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .question-section h3 {
+            color: #e50914;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .question-text {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .options {
+            margin-bottom: 12px;
+        }
+
+        .option {
+            margin-bottom: 8px;
+            padding: 6px;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+        }
+
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .option label {
+            cursor: pointer;
+            color: #555;
+            font-size: 12px;
+        }
+
+        .submit-btn {
+            background-color: #e50914;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #c70812;
+        }
+
+        .submit-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            font-size: 12px;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.correct {
+            background-color: #f9f9f9;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .result.incorrect {
+            background-color: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .prevention-question-section {
+            background-color: #f9f9f9;
+            border: 2px solid #e50914;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .prevention-question-section h3 {
+            color: #e50914;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .completion-status {
+            background-color: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #856404;
+        }
+
+        .completion-status.all-done {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .modal {
+            display: none;
+            position: absolute;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 960px;
+            height: 540px;
+            background-color: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 15px;
+            border: 2px solid #e50914;
+            border-radius: 8px;
+            width: 550px;
+            max-height: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            overflow-y: auto;
+        }
+
+        .modal h2 {
+            color: #e50914;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .modal p {
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .modal button {
+            background-color: #e50914;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            margin-right: 8px;
+            margin-top: 10px;
+        }
+
+        .modal button:hover {
+            background-color: #c70812;
+        }
+
+        .completion-modal {
+            display: none;
+            position: absolute;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 960px;
+            height: 540px;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .completion-modal.show {
+            display: flex;
+        }
+
+        .completion-modal-content {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: 3px solid #155724;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+        }
+
+        .completion-modal-content h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .completion-modal-content p {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: white;
+            line-height: 1.6;
+        }
+
+        .completion-modal-content .emoji {
+            font-size: 60px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .completion-modal-button {
+            background-color: white;
+            color: #28a745;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .completion-modal-button:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        .non-suspicious-modal-content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .non-suspicious-modal-content h2 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+
+        .non-suspicious-modal-content p {
+            color: #555;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Case-2: SMS Impersonation Scam</h1>
+        
+        <div class="case-info">
+            <div><span class="label">Victim:</span><span class="value">Linda</span></div>
+            <div><span class="label">Platform:</span><span class="value">Text Messages & Phone Call</span></div>
+            <div><span class="label">Details:</span><span class="value">I received a call from my grandaughter,she says its urgent and needs money immediately but the number was unfamiliar and the voice sounded different, what should I do?</span></div>
+        </div>
+
+        <div id="completionModal" class="completion-modal">
+            <div class="completion-modal-content">
+                <span class="emoji">✅</span>
+                <h2>Case Completed!</h2>
+                <p>Excellent work! You successfully identified all red flags in this SMS scam and provided all correct answers.</p>
+                <p>You're now better equipped to recognize family impersonation scams!</p>
+                <button class="completion-modal-button" onclick="backToCases()">Back to Cases</button>
+            </div>
+        </div>
+
+        <div id="completionStatus" class="completion-status">
+            ⚠️ Complete all questions to finish the case: Audio Flags ❌ | Red Flags ❌ | Final Response ❌ | Prevention ❌
+        </div>
+
+        <!-- Audio Section -->
+        <div class="audio-section">
+            <h3>🎙️ Listen to Call Recording</h3>
+            <audio controls style="margin-bottom: 10px;">
+                <source src="scamcall.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            
+            <!-- Audio Red Flags Question -->
+            <div class="audio-question">
+                <p>What are the red flags in this voice call?</p>
+                <div class="audio-options">
+                    <div class="audio-option">
+                        <input type="checkbox" id="flag1" value="emotional">
+                        <label for="flag1">Asking to keep it secret from rest of family</label>
+                    </div>
+                    <div class="audio-option">
+                        <input type="checkbox" id="flag2" value="vague">
+                        <label for="flag2">Vague about purpose of money</label>
+                    </div>
+                    <div class="audio-option">
+                        <input type="checkbox" id="flag3" value="wrong1">
+                        <label for="flag3">Clear identification with full legal name</label>
+                    </div>
+                    <div class="audio-option">
+                        <input type="checkbox" id="flag4" value="wrong2">
+                        <label for="flag4">Offers to wait 24 hours for verification</label>
+                    </div>
+                </div>
+                <button class="audio-submit" onclick="checkAudioFlags()">Check Answer</button>
+                <div id="audioResult" class="audio-result"></div>
+            </div>
+        </div>
+
+        <div class="score-display">
+            🚩 Red Flags Found: <span id="foundCount">0</span> / 10
+        </div>
+
+        <!-- SMS Section -->
+        <div class="sms-section">
+            <div class="sms-header">Text Message Conversation</div>
+            <div class="sms-content">
+                
+                <div class="conversation-thread">
+                    <div class="message-header">
+                        <span class="message-bubble" data-suspicious="true" data-info="unfamiliar" data-group="unfamiliar-group" onclick="clickMessage(event, true)">Unknown Number: +1 (555) 123-4567</span>
+                    </div>
+
+                    <div class="message receiver">
+                        <div class="message-bubble" data-suspicious="true" data-info="greeting" data-group="greeting-group" onclick="clickMessage(event, true)">Grandma, it's me.</div>
+                        <span class="message-time">2:15 PM</span>
+                    </div>
+
+                    <div class="message receiver">
+                        <div class="message-bubble" data-suspicious="true" data-info="newNumber" data-group="newNumber-group" onclick="clickMessage(event, true)">I'm so sorry to message you from a new number.</div>
+                        <span class="message-time">2:16 PM</span>
+                    </div>
+
+                    <div class="message receiver">
+                        <div class="message-bubble" data-suspicious="false" onclick="clickMessage(event, false)">My phone isn't working, so I'm using someone else's.</div>
+                        <span class="message-time">2:17 PM</span>
+                    </div>
+
+                    <div class="message receiver">
+                        <div class="message-bubble" data-suspicious="true" data-info="emotional" data-group="emotional-group" onclick="clickMessage(event, true)">Thank you for helping me… I really don't know who else to ask.</div>
+                        <span class="message-time">2:18 PM</span>
+                    </div>
+
+                    <div class="message receiver">
+                        <div class="message-bubble" data-suspicious="false" onclick="clickMessage(event, false)">This is the account I need you to transfer to.</div>
+                        <span class="message-time">2:20 PM</span>
+                    </div>
+
+                    <div class="message receiver">
+                        <div class="message-bubble" data-suspicious="true" data-info="bankDetails" data-group="bankDetails-group" onclick="clickMessage(event, true)"><strong>Bank:</strong> DBS<br><strong>Name:</strong> Lim Wei Sheng<br><strong>Account:</strong> 123-456-789</div>
+                        <span class="message-time">2:21 PM</span>
+                    </div>
+
+                    <div class="message receiver">
+                        <div class="message-bubble" data-suspicious="true" data-info="amount" data-group="amount-group" onclick="clickMessage(event, true)">Please send $3000 as soon as you can.</div>
+                        <span class="message-time">2:22 PM</span>
+                    </div>
+
+                    <div class="message receiver">
+                        <div class="message-bubble" data-suspicious="true" data-info="screenshot" data-group="screenshot-group" onclick="clickMessage(event, true)">After you transfer, please send me a screenshot so I can show them.</div>
+                        <span class="message-time">2:24 PM</span>
+                    </div>
+
+                    <div class="message receiver">
+                        <div class="message-bubble" data-suspicious="true" data-info="hideName" data-group="hideName-group" onclick="clickMessage(event, true)">Please don't put my name in the transfer reference. Just write "urgent".</div>
+                        <span class="message-time">2:25 PM</span>
+                    </div>
+
+                    <div class="message receiver">
+                        <div class="message-bubble" data-suspicious="true" data-info="hurry" data-group="hurry-group" onclick="clickMessage(event, true)">Grandma, please hurry. I'll explain everything once this is settled.</div>
+                        <span class="message-time">2:28 PM</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Question Section -->
+        <div class="question-section">
+            <h3>What Should Linda Do?</h3>
+            <p class="question-text">What is the BEST action Linda should take?</p>
+            
+            <div class="options">
+                <div class="option">
+                    <input type="radio" id="response1" name="response" value="a">
+                    <label for="response1">Immediately send the money to help the family member</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="response2" name="response" value="b">
+                    <label for="response2">Stop texting and call the family member back on their known phone number to verify</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="response3" name="response" value="c">
+                    <label for="response3">Reply asking for personal information to confirm it's really them</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="response4" name="response" value="d">
+                    <label for="response4">Forward messages to other family members to get their opinion</label>
+                </div>
+            </div>
+            
+            <button class="submit-btn" id="submitBtn" onclick="checkResponse()" disabled>Submit Answer</button>
+            <div id="responseResult" class="result"></div>
+        </div>
+
+        <!-- Prevention Question Section -->
+        <div class="prevention-question-section">
+            <h3>Prevention Strategies</h3>
+            <p class="question-text">Which of the following is the BEST way for Linda to prevent similar situations?</p>
+            
+            <div class="options">
+                <div class="option">
+                    <input type="radio" id="prevention1" name="prevention" value="a">
+                    <label for="prevention1">Share her bank account details with family members for easy transfers</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="prevention2" name="prevention" value="b">
+                    <label for="prevention2">Establish a secret verification code that only her family knows</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="prevention3" name="prevention" value="c">
+                    <label for="prevention3">Always respond to urgent messages immediately without delays</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="prevention4" name="prevention" value="d">
+                    <label for="prevention4">Ask the caller for personal information to verify their identity</label>
+                </div>
+            </div>
+            
+            <button class="submit-btn" id="preventionBtn" onclick="checkPrevention()" disabled>Submit Answer</button>
+            <div id="preventionResult" class="result"></div>
+        </div>
+    </div>
+
+    <!-- Number Modal -->
+    <div id="numberModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Unknown Phone Number</h2>
+            <p><strong>Phone:</strong> +1 (555) 123-4567</p>
+            <p><strong>Issue:</strong> Messages come from an unfamiliar phone number claiming to be a family member.</p>
+            <p>Scammers use spoofed or burner numbers to hide their identity. Real family members would contact you from a number you recognize or would identify themselves with specific details only you would know.</p>
+            <button onclick="closeModal('numberModal')">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Greeting Modal -->
+    <div id="greetingModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Vague Greeting</h2>
+            <p><strong>Issue:</strong> "Grandma, it's me" doesn't specify who they are.</p>
+            <p>Real family members would use their name or identify themselves more specifically. This vague greeting works with anyone and tests if you'll accept an unverified identity.</p>
+            <button onclick="closeModal('greetingModal')">Got it!</button>
+        </div>
+    </div>
+
+    <!-- New Number Modal -->
+    <div id="newNumberModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Suspicious "New Number" Excuse</h2>
+            <p><strong>Issue:</strong> Claiming their phone is broken explains why they're contacting from an unfamiliar number.</p>
+            <p>This is a classic scam tactic. Real family members would still have a way to verify themselves or would ask you to call their known number.</p>
+            <button onclick="closeModal('newNumberModal')">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Emotional Modal -->
+    <div id="emotionalModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Emotional Manipulation</h2>
+            <p><strong>Issue:</strong> "I really don't know who else to ask" exploits protective instincts.</p>
+            <p>This creates urgency and makes you feel special—you're the only one who can help. It bypasses rational thinking.</p>
+            <button onclick="closeModal('emotionalModal')">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Bank Details Modal -->
+    <div id="bankDetailsModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Third-Party Bank Account & Suspicious Details</h2>
+            <p><strong>Issues:</strong></p>
+            <ul style="margin-left: 20px; font-size: 13px; line-height: 1.5; margin-top: 8px;">
+                <li><strong>Wrong Account Name:</strong> "Lim Wei Sheng" is not your family member's name</li>
+                <li><strong>Third-Party Account:</strong> Money going to a stranger's account = fraud</li>
+                <li><strong>Unknown Account Number:</strong> Never send to accounts you can't verify</li>
+            </ul>
+            <p style="margin-top: 10px; font-size: 13px;">Scammers use other people's accounts to quickly move and withdraw stolen funds.</p>
+            <button onclick="closeModal('bankDetailsModal')">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Amount Modal -->
+    <div id="amountModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Suspicious Round Amount</h2>
+            <p><strong>Issue:</strong> $3,000 is a suspiciously round amount common in scams.</p>
+            <p>Scammers request amounts that seem urgent but not so large they'd trigger bank alerts. Real emergencies usually involve specific amounts with detailed explanations.</p>
+            <button onclick="closeModal('amountModal')">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Screenshot Modal -->
+    <div id="screenshotModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Request for Proof</h2>
+            <p><strong>Issue:</strong> Asking for a screenshot of the transfer to "show authorities" is highly suspicious.</p>
+            <p>This serves two purposes for scammers: (1) Confirms the money was actually sent, and (2) Uses the screenshot to social engineer other family members into sending more money.</p>
+            <button onclick="closeModal('screenshotModal')">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Hide Name Modal -->
+    <div id="hideNameModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Request to Hide Sender Name</h2>
+            <p><strong>Issue:</strong> Asking not to include their name in the transfer reference is a major red flag.</p>
+            <p>This makes the transaction harder to trace and dispute if it's later identified as fraud. Legitimate transfers always include clear identification of who the money is going to.</p>
+            <button onclick="closeModal('hideNameModal')">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Hurry Modal -->
+    <div id="hurryModal" class="modal">
+        <div class="modal-content">
+            <h2>❌ Time Pressure & Vague Details</h2>
+            <p><strong>Issue:</strong> "Grandma, please hurry" creates artificial urgency, and "I'll explain everything once this is settled" avoids giving specifics.</p>
+            <p>Scammers pressure victims to act without thinking. Real emergencies have details and can wait 5 minutes for identity verification.</p>
+            <button onclick="closeModal('hurryModal')">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Non-Suspicious Modal -->
+    <div id="nonSuspiciousModal" class="modal">
+        <div class="modal-content non-suspicious-modal-content">
+            <h2>ℹ️ Not Immediately Suspicious</h2>
+            <p>This message on its own isn't a red flag, but combined with the other suspicious elements, it's part of the overall scam pattern.</p>
+            <button onclick="closeModal('nonSuspiciousModal')">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        let groupsFound = new Set();
+        let audioFlagsAnswered = false;
+        let allTextMessagesChecked = false;
+        let responseAnswered = false;
+        let preventionAnswered = false;
+
+        function clickMessage(event, isSuspicious) {
+            event.stopPropagation();
+            
+            const element = event.currentTarget;
+            const infoType = element.dataset.info;
+            const groupId = element.dataset.group;
+            
+            if (isSuspicious) {
+                if (groupId && !groupsFound.has(groupId)) {
+                    groupsFound.add(groupId);
+                    updateScore();
+                    
+                    // Highlight with correct styling
+                    element.classList.add('correct');
+                    
+                    // Check if all suspicious messages have been found
+                    if (groupsFound.size === 10) {
+                        allTextMessagesChecked = true;
+                        updateCompletionStatus();
+                    }
+                }
+                
+                // Open appropriate modal
+                openModal(infoType);
+            } else {
+                // Non-suspicious element
+                element.classList.add('incorrect');
+                setTimeout(() => {
+                    element.classList.remove('incorrect');
+                }, 500);
+                
+                openModal('nonSuspicious');
+            }
+        }
+
+        function openModal(modalId) {
+            const modalMap = {
+                'unfamiliar': 'numberModal',
+                'greeting': 'greetingModal',
+                'newNumber': 'newNumberModal',
+                'emotional': 'emotionalModal',
+                'bankDetails': 'bankDetailsModal',
+                'amount': 'amountModal',
+                'screenshot': 'screenshotModal',
+                'hideName': 'hideNameModal',
+                'hurry': 'hurryModal',
+                'nonSuspicious': 'nonSuspiciousModal'
+            };
+            
+            if (modalMap[modalId]) {
+                document.getElementById(modalMap[modalId]).classList.add('show');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function updateScore() {
+            document.getElementById('foundCount').textContent = groupsFound.size;
+        }
+
+        function checkAudioFlags() {
+            const flag1 = document.getElementById('flag1').checked;
+            const flag2 = document.getElementById('flag2').checked;
+            const flag3 = document.getElementById('flag3').checked;
+            const flag4 = document.getElementById('flag4').checked;
+            
+            const resultDiv = document.getElementById('audioResult');
+            
+            // Only flags 1 and 2 are correct red flags
+            if (flag1 && flag2 && !flag3 && !flag4) {
+                resultDiv.classList.remove('incorrect');
+                resultDiv.classList.add('show', 'correct');
+                resultDiv.innerHTML = '✓ <strong>Correct!</strong> Clear identification and patience are what legitimate callers provide.';
+                audioFlagsAnswered = true;
+                updateCompletionStatus();
+            } else if ((flag1 || flag2) && !(flag1 && flag2 && !flag3 && !flag4)) {
+                resultDiv.classList.remove('correct');
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.innerHTML = '✗ Not quite. Select only the red flags. Avoid the distractors that describe legitimate behavior.';
+                audioFlagsAnswered = false;
+            } else {
+                resultDiv.classList.remove('correct');
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.innerHTML = '✗ Please select the appropriate options.';
+                audioFlagsAnswered = false;
+            }
+        }
+
+        function checkResponse() {
+            const selected = document.querySelector('input[name="response"]:checked');
+            const resultDiv = document.getElementById('responseResult');
+            
+            if (!selected) {
+                resultDiv.classList.remove('correct', 'incorrect');
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.textContent = 'Please select an answer before submitting.';
+                return;
+            }
+            
+            resultDiv.classList.remove('correct', 'incorrect');
+            
+            if (selected.value === 'b') {
+                resultDiv.classList.add('show', 'correct');
+                resultDiv.innerHTML = '✓ <strong>Correct!</strong> Always verify identity by calling back on a known phone number. This prevents money loss and confirms whether the emergency is real.';
+                responseAnswered = true;
+                updateCompletionStatus();
+            } else if (selected.value === 'a') {
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.innerHTML = '<strong>❌ Consequence:</strong> Money is lost to scammers. Once transferred, funds are nearly impossible to recover.';
+                responseAnswered = false;
+            } else if (selected.value === 'c') {
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.innerHTML = '<strong>❌ Consequence:</strong> Scammers know basic family info from social media. More questions just delays while they pressure you more.';
+                responseAnswered = false;
+            } else if (selected.value === 'd') {
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.innerHTML = '<strong>❌ Consequence:</strong> This spreads panic. Other family members might send money too, multiplying losses.';
+                responseAnswered = false;
+            }
+        }
+
+        function checkPrevention() {
+            const selected = document.querySelector('input[name="prevention"]:checked');
+            const resultDiv = document.getElementById('preventionResult');
+            
+            if (!selected) {
+                resultDiv.classList.remove('correct', 'incorrect');
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.textContent = 'Please select an answer before submitting.';
+                return;
+            }
+            
+            resultDiv.classList.remove('correct', 'incorrect');
+            
+            if (selected.value === 'b') {
+                resultDiv.classList.add('show', 'correct');
+                resultDiv.innerHTML = '✓ <strong>Correct!</strong> A secret family verification code is the best defense. Scammers may know public information, but they won\'t know your private verification phrase.';
+                preventionAnswered = true;
+                updateCompletionStatus();
+            } else if (selected.value === 'a') {
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.innerHTML = '<strong>❌ Incorrect:</strong> Sharing bank details makes it easier for scammers to impersonate family and commit fraud.';
+                preventionAnswered = false;
+            } else if (selected.value === 'c') {
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.innerHTML = '<strong>❌ Incorrect:</strong> Taking time to verify is essential. Legitimate emergencies can wait 5 minutes for confirmation.';
+                preventionAnswered = false;
+            } else if (selected.value === 'd') {
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.innerHTML = '<strong>❌ Incorrect:</strong> Scammers know basic family information from social media. Always call back on a known number instead.';
+                preventionAnswered = false;
+            }
+        }
+
+        function updateCompletionStatus() {
+            const statusDiv = document.getElementById('completionStatus');
+            const audioStatus = audioFlagsAnswered ? '✓' : '❌';
+            const messageStatus = allTextMessagesChecked ? '✓' : '❌';
+            const responseStatus = responseAnswered ? '✓' : '❌';
+            const preventionStatus = preventionAnswered ? '✓' : '❌';
+            
+            statusDiv.innerHTML = `📋 Complete all questions to finish: Audio Flags ${audioStatus} | Red Flags ${messageStatus} | Final Response ${responseStatus} | Prevention ${preventionStatus}`;
+            
+            // Enable submit button if all conditions are met
+            const submitBtn = document.getElementById('submitBtn');
+            const preventionBtn = document.getElementById('preventionBtn');
+            
+            if (audioFlagsAnswered && allTextMessagesChecked && responseAnswered && preventionAnswered) {
+                statusDiv.classList.add('all-done');
+                statusDiv.innerHTML = '✅ All questions answered! You can now view the completion screen.';
+                showCompletionMessage();
+            } else {
+                submitBtn.disabled = !(audioFlagsAnswered && allTextMessagesChecked);
+                preventionBtn.disabled = false;
+            }
+        }
+
+        function showCompletionMessage() {
+            const completionModal = document.getElementById('completionModal');
+            if (completionModal) {
+                completionModal.classList.add('show');
+            }
+        }
+
+        function backToCases() {
+            window.location.href = 'cases3.html';
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+
+        // Enable prevention button when option is selected
+        document.addEventListener('change', function(event) {
+            if (event.target.name === 'prevention') {
+                document.getElementById('preventionBtn').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

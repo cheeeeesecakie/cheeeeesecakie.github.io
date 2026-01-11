@@ -18,8 +18,8 @@
             color: #333;
             background-color: #f4f4f4;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: flex-start;
+            align-items: flex-start;
         }
         .container {
             width: 960px;
@@ -59,6 +59,22 @@
             border-radius: 3px;
             font-size: 16px;
             font-weight: bold;
+        }
+        .completion-status {
+            background-color: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #856404;
+        }
+
+        .completion-status.all-done {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
         }
         .email-section {
             margin-top: 15px;
@@ -166,14 +182,13 @@
         }
         .modal {
             display: none;
-            position: fixed;
+            position: absolute;
             z-index: 1000;
             left: 0;
             top: 0;
-            width: 100%;
-            height: 100%;
+            width: 960px;
+            height: 540px;
             background-color: rgba(0,0,0,0.7);
-            display: none;
             justify-content: center;
             align-items: center;
         }
@@ -298,6 +313,180 @@
             margin-bottom: 5px;
             line-height: 1.4;
         }
+
+        .question-section {
+            background-color: #f9f9f9;
+            border: 2px solid #e50914;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .question-section h3 {
+            color: #e50914;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .question-text {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .options {
+            margin-bottom: 15px;
+        }
+
+        .option {
+            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .option label {
+            cursor: pointer;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            background-color: #e50914;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #c70812;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.correct {
+            background-color: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .result.incorrect {
+            background-color: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .completion-modal {
+            display: none;
+            position: absolute;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 960px;
+            height: 540px;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .completion-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .completion-modal-content {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: 3px solid #155724;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .completion-modal-content h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .completion-modal-content p {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: white;
+            line-height: 1.6;
+        }
+
+        .completion-modal-content .emoji {
+            font-size: 60px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .completion-modal-button {
+            background-color: white;
+            color: #28a745;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .completion-modal-button:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -310,8 +499,22 @@
             <div><span class="label">Details:</span><span class="value">Hi, I got a email from Nextflix saying that my account is going to be suspended next month. Is this a scam?</span></div>
         </div>
 
+        <div id="completionModal" class="completion-modal">
+            <div class="completion-modal-content">
+                <span class="emoji">✅</span>
+                <h2>Case Completed!</h2>
+                <p>Excellent work! You successfully identified all 4 suspicious elements in the email AND provided the correct response.</p>
+                <p>You're now ready to spot phishing scams and protect your accounts!</p>
+                <button class="completion-modal-button" onclick="backToCases()">Back to Cases</button>
+            </div>
+        </div>
+
         <div class="score-display">
-            📊 Suspicious Parts Found: <span id="foundCount">0</span> / 4
+             🚩 Red Flags Found: <span id="foundCount">0</span> / 4
+        </div>
+
+        <div id="completionStatus" class="completion-status">
+            📋 Complete all questions to finish: Red Flags ❌ | Response ❌
         </div>
 
         <div class="email-section">
@@ -335,6 +538,33 @@
 - <span class="clickable-word" onclick="clickWord(this, event)">The</span> <span class="clickable-word" onclick="clickWord(this, event)">Nextflix</span> <span class="clickable-word" onclick="clickWord(this, event)">team</span>
                 </div>
             </div>
+        </div>
+
+        <div class="question-section">
+            <h3>How Should Daniel Respond?</h3>
+            <p class="question-text">What is the BEST action Daniel should take after receiving this suspicious email?</p>
+            
+            <div class="options">
+                <div class="option">
+                    <input type="radio" id="response1" name="response" value="a">
+                    <label for="response1">Click the "Restart Membership" button to update his account immediately</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="response2" name="response" value="b">
+                    <label for="response2">Ignore the email and go directly to Netflix.com to check his account status</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="response3" name="response" value="c">
+                    <label for="response3">Reply to the email asking for more information about the suspension</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="response4" name="response" value="d">
+                    <label for="response4">Forward the email to his friends to see if they received it too</label>
+                </div>
+            </div>
+            
+            <button class="submit-btn" onclick="checkResponse()">Submit Answer</button>
+            <div id="responseResult" class="result"></div>
         </div>
     </div>
 
@@ -414,6 +644,8 @@
 
     <script>
         let groupsFound = new Set();
+        let responseAnswered = false;
+        let responseCorrect = false;
 
         function clickWord(element, event) {
             // Prevent event propagation
@@ -485,6 +717,72 @@
 
         function updateScore() {
             document.getElementById('foundCount').textContent = groupsFound.size;
+            updateCompletionStatus();
+        }
+
+        function updateCompletionStatus() {
+            const statusDiv = document.getElementById('completionStatus');
+            const suspiciousStatus = groupsFound.size === 4 ? '✓' : '❌';
+            const responseStatus = responseCorrect ? '✓' : '❌';
+            
+            statusDiv.innerHTML = `📋 Complete all questions to finish: Red Flags ${suspiciousStatus} | Response ${responseStatus}`;
+            
+            if (groupsFound.size === 4 && responseCorrect) {
+                statusDiv.classList.add('all-done');
+                statusDiv.innerHTML = '✅ All questions answered! You can now view the completion screen.';
+                showCompletionMessage();
+            } else {
+                statusDiv.classList.remove('all-done');
+            }
+        }
+
+        function checkResponse() {
+            const selected = document.querySelector('input[name="response"]:checked');
+            const resultDiv = document.getElementById('responseResult');
+            
+            if (!selected) {
+                resultDiv.classList.remove('correct', 'incorrect');
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.textContent = 'Please select an answer before submitting.';
+                return;
+            }
+            
+            responseAnswered = true;
+            resultDiv.classList.remove('correct', 'incorrect');
+            
+            if (selected.value === 'b') {
+                // Correct answer
+                resultDiv.classList.add('show', 'correct');
+                resultDiv.textContent = '✓ Correct! The safest approach is to ignore suspicious emails and go directly to the official Netflix website to check his account status. This way, he bypasses any malicious links and verifies information through the legitimate source.';
+                responseCorrect = true;
+                updateCompletionStatus();
+            } else if (selected.value === 'a') {
+                // Clicking the button
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.innerHTML = '<strong>❌ Consequences:</strong><br>Daniel\'s credentials are stolen. His Netflix account is compromised, and the scammers use his payment information to make unauthorized purchases. He also receives fraudulent charges on his credit card and must spend weeks disputing them with his bank.';
+                responseCorrect = false;
+            } else if (selected.value === 'c') {
+                // Replying to the email
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.innerHTML = '<strong>❌ Consequences:</strong><br>By replying, Daniel confirms his email is active and monitored. The scammers now know he\'s a responsive target. They escalate their attacks with more sophisticated phishing emails and may sell his contact information to other scammers.';
+                responseCorrect = false;
+            } else if (selected.value === 'd') {
+                // Forwarding to friends
+                resultDiv.classList.add('show', 'incorrect');
+                resultDiv.innerHTML = '<strong>❌ Consequences:</strong><br>Daniel unknowingly spreads the scam to his friends and family. His friends fall for it, and Daniel\'s reputation is damaged. Multiple people lose money, and their accounts are compromised because Daniel didn\'t verify the email first.';
+                responseCorrect = false;
+            }
+        }
+
+        function showCompletionMessage() {
+            const completionModal = document.getElementById('completionModal');
+            if (completionModal) {
+                completionModal.classList.add('show');
+            }
+        }
+
+        function backToCases() {
+            window.location.href = 'cases2.html';
         }
 
         window.onclick = function(event) {

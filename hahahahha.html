@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Display</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .image-container {
+            position: relative;
+            width: 960px;
+            height: 540px;
+        }
+        img {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .next-arrow {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(100, 150, 200, 0.8);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        .next-arrow:hover {
+            background: rgba(100, 150, 200, 1);
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <img id="mainImage" src="phone.png" alt="Description of image">
+        <div style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; position: absolute; bottom: 20px; left: 20px; right: 20px; background: linear-gradient(135deg, rgba(25, 55, 109, 0.8), rgba(35, 75, 140, 0.8)); color: white; padding: 20px; border-radius: 10px; font-size: 18px; max-height: 180px; overflow-y: auto; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); border: 2px solid rgba(100, 150, 200, 0.6);">
+            <div id="speakerName" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: bold; margin-bottom: 10px; font-size: 20px; letter-spacing: 0.5px;">You</div>
+            <div id="dialogueText">Who is calling me at this time?</div>
+        </div>
+        <button class="next-arrow" onclick="nextDialogue()">→</button>
+    </div>
+
+    <script>
+        let currentDialogue = 0;
+        const dialogues = [
+            { speaker: "You", text: "Who is calling me at this time?", image: "phone.png" },
+            { speaker: "Lily", text: "I sent you a copy of the manual that you lost. Make sure to actually look through it this time. Good luck!", image: "smile.png" },
+            // Add more dialogues here
+        ];
+
+        function nextDialogue() {
+            currentDialogue++;
+            if (currentDialogue >= dialogues.length) {
+                // When all dialogues are done, navigate to next page
+                window.location.href = 'actually_code.html';
+                return;
+            }
+            
+            document.getElementById('speakerName').textContent = dialogues[currentDialogue].speaker;
+            document.getElementById('dialogueText').textContent = dialogues[currentDialogue].text;
+            document.getElementById('mainImage').src = dialogues[currentDialogue].image;
+        }
+    </script>
+</body>
+</html>
