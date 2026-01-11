@@ -350,13 +350,14 @@
             transition: background-color 0.3s;
         }
 
-        .submit-btn:hover {
+        .submit-btn:hover:not(:disabled) {
             background-color: #c70812;
         }
 
         .submit-btn:disabled {
             background-color: #ccc;
             cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .result {
@@ -372,7 +373,7 @@
         }
 
         .result.correct {
-            background-color: #f9f9f9;
+            background-color: #d4edda;
             border: 2px solid #28a745;
             color: #155724;
         }
@@ -423,7 +424,6 @@
             width: 960px;
             height: 540px;
             background-color: rgba(0,0,0,0.7);
-            display: none;
             justify-content: center;
             align-items: center;
         }
@@ -453,6 +453,16 @@
             font-size: 13px;
             line-height: 1.5;
             margin-bottom: 8px;
+        }
+
+        .modal ul {
+            margin-left: 20px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .modal li {
+            margin-bottom: 5px;
         }
 
         .modal button {
@@ -556,12 +566,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>Case-2: SMS Impersonation Scam</h1>
+        <h1>Case-2: SMS & Call From Relative</h1>
         
         <div class="case-info">
             <div><span class="label">Victim:</span><span class="value">Linda</span></div>
             <div><span class="label">Platform:</span><span class="value">Text Messages & Phone Call</span></div>
-            <div><span class="label">Details:</span><span class="value">I received a call from my grandaughter,she says its urgent and needs money immediately but the number was unfamiliar and the voice sounded different, what should I do?</span></div>
+            <div><span class="label">Details:</span><span class="value">I received a call from my granddaughter, she says it's urgent and needs money immediately but the number was unfamiliar and the voice sounded different, what should I do?</span></div>
         </div>
 
         <div id="completionModal" class="completion-modal">
@@ -581,10 +591,7 @@
         <!-- Audio Section -->
         <div class="audio-section">
             <h3>🎙️ Listen to Call Recording</h3>
-            <audio controls style="margin-bottom: 10px;">
-                <source src="scamcall.mp3" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
+            <div class="audio-placeholder">🔊 Audio playback not available in this demo. In a live environment, you would hear a call with background noise and voice strain.</div>
             
             <!-- Audio Red Flags Question -->
             <div class="audio-question">
@@ -592,7 +599,7 @@
                 <div class="audio-options">
                     <div class="audio-option">
                         <input type="checkbox" id="flag1" value="emotional">
-                        <label for="flag1">Asking to keep it secret from rest of family</label>
+                        <label for="flag1">Voice does not quite sound like granddaughter</label>
                     </div>
                     <div class="audio-option">
                         <input type="checkbox" id="flag2" value="vague">
@@ -613,7 +620,7 @@
         </div>
 
         <div class="score-display">
-            🚩 Red Flags Found: <span id="foundCount">0</span> / 10
+            🚩 Red Flags Found: <span id="foundCount">0</span> / 9
         </div>
 
         <!-- SMS Section -->
@@ -783,12 +790,12 @@
         <div class="modal-content">
             <h2>❌ Third-Party Bank Account & Suspicious Details</h2>
             <p><strong>Issues:</strong></p>
-            <ul style="margin-left: 20px; font-size: 13px; line-height: 1.5; margin-top: 8px;">
+            <ul>
                 <li><strong>Wrong Account Name:</strong> "Lim Wei Sheng" is not your family member's name</li>
                 <li><strong>Third-Party Account:</strong> Money going to a stranger's account = fraud</li>
                 <li><strong>Unknown Account Number:</strong> Never send to accounts you can't verify</li>
             </ul>
-            <p style="margin-top: 10px; font-size: 13px;">Scammers use other people's accounts to quickly move and withdraw stolen funds.</p>
+            <p>Scammers use other people's accounts to quickly move and withdraw stolen funds.</p>
             <button onclick="closeModal('bankDetailsModal')">Got it!</button>
         </div>
     </div>
@@ -865,7 +872,7 @@
                     element.classList.add('correct');
                     
                     // Check if all suspicious messages have been found
-                    if (groupsFound.size === 10) {
+                    if (groupsFound.size === 9) {
                         allTextMessagesChecked = true;
                         updateCompletionStatus();
                     }
@@ -923,7 +930,7 @@
             if (flag1 && flag2 && !flag3 && !flag4) {
                 resultDiv.classList.remove('incorrect');
                 resultDiv.classList.add('show', 'correct');
-                resultDiv.innerHTML = '✓ <strong>Correct!</strong> Clear identification and patience are what legitimate callers provide.';
+                resultDiv.innerHTML = '✓ <strong>Correct!</strong> Discrepancies and vague explanations are key red flags. Clear identification and patience are what legitimate callers provide.';
                 audioFlagsAnswered = true;
                 updateCompletionStatus();
             } else if ((flag1 || flag2) && !(flag1 && flag2 && !flag3 && !flag4)) {
@@ -931,11 +938,13 @@
                 resultDiv.classList.add('show', 'incorrect');
                 resultDiv.innerHTML = '✗ Not quite. Select only the red flags. Avoid the distractors that describe legitimate behavior.';
                 audioFlagsAnswered = false;
+                updateCompletionStatus();
             } else {
                 resultDiv.classList.remove('correct');
                 resultDiv.classList.add('show', 'incorrect');
                 resultDiv.innerHTML = '✗ Please select the appropriate options.';
                 audioFlagsAnswered = false;
+                updateCompletionStatus();
             }
         }
 
@@ -961,14 +970,17 @@
                 resultDiv.classList.add('show', 'incorrect');
                 resultDiv.innerHTML = '<strong>❌ Consequence:</strong> Money is lost to scammers. Once transferred, funds are nearly impossible to recover.';
                 responseAnswered = false;
+                updateCompletionStatus();
             } else if (selected.value === 'c') {
                 resultDiv.classList.add('show', 'incorrect');
                 resultDiv.innerHTML = '<strong>❌ Consequence:</strong> Scammers know basic family info from social media. More questions just delays while they pressure you more.';
                 responseAnswered = false;
+                updateCompletionStatus();
             } else if (selected.value === 'd') {
                 resultDiv.classList.add('show', 'incorrect');
                 resultDiv.innerHTML = '<strong>❌ Consequence:</strong> This spreads panic. Other family members might send money too, multiplying losses.';
                 responseAnswered = false;
+                updateCompletionStatus();
             }
         }
 
@@ -994,49 +1006,68 @@
                 resultDiv.classList.add('show', 'incorrect');
                 resultDiv.innerHTML = '<strong>❌ Incorrect:</strong> Sharing bank details makes it easier for scammers to impersonate family and commit fraud.';
                 preventionAnswered = false;
+                updateCompletionStatus();
             } else if (selected.value === 'c') {
                 resultDiv.classList.add('show', 'incorrect');
                 resultDiv.innerHTML = '<strong>❌ Incorrect:</strong> Taking time to verify is essential. Legitimate emergencies can wait 5 minutes for confirmation.';
                 preventionAnswered = false;
+                updateCompletionStatus();
             } else if (selected.value === 'd') {
                 resultDiv.classList.add('show', 'incorrect');
                 resultDiv.innerHTML = '<strong>❌ Incorrect:</strong> Scammers know basic family information from social media. Always call back on a known number instead.';
                 preventionAnswered = false;
+                updateCompletionStatus();
             }
         }
 
-        function updateCompletionStatus() {
-            const statusDiv = document.getElementById('completionStatus');
-            const audioStatus = audioFlagsAnswered ? '✓' : '❌';
-            const messageStatus = allTextMessagesChecked ? '✓' : '❌';
-            const responseStatus = responseAnswered ? '✓' : '❌';
-            const preventionStatus = preventionAnswered ? '✓' : '❌';
-            
-            statusDiv.innerHTML = `📋 Complete all questions to finish: Audio Flags ${audioStatus} | Red Flags ${messageStatus} | Final Response ${responseStatus} | Prevention ${preventionStatus}`;
-            
-            // Enable submit button if all conditions are met
-            const submitBtn = document.getElementById('submitBtn');
-            const preventionBtn = document.getElementById('preventionBtn');
-            
-            if (audioFlagsAnswered && allTextMessagesChecked && responseAnswered && preventionAnswered) {
-                statusDiv.classList.add('all-done');
-                statusDiv.innerHTML = '✅ All questions answered! You can now view the completion screen.';
-                showCompletionMessage();
-            } else {
-                submitBtn.disabled = !(audioFlagsAnswered && allTextMessagesChecked);
-                preventionBtn.disabled = false;
-            }
-        }
+       function updateCompletionStatus() {
+    const statusDiv = document.getElementById('completionStatus');
+    const audioStatus = audioFlagsAnswered ? '✓' : '❌';
+    const messageStatus = allTextMessagesChecked ? '✓' : '❌';
+    const responseStatus = responseAnswered ? '✓' : '❌';
+    const preventionStatus = preventionAnswered ? '✓' : '❌';
+    
+    statusDiv.innerHTML = `📋 Complete all questions to finish: Audio Flags ${audioStatus} | Red Flags ${messageStatus} | Final Response ${responseStatus} | Prevention ${preventionStatus}`;
+    
+    // Enable submit button if response option is selected
+    const submitBtn = document.getElementById('submitBtn');
+    const preventionBtn = document.getElementById('preventionBtn');
+    
+    const responseSelected = document.querySelector('input[name="response"]:checked');
+    const preventionSelected = document.querySelector('input[name="prevention"]:checked');
+    
+    if (submitBtn) {
+        submitBtn.disabled = !responseSelected;
+    }
+    
+    if (preventionBtn) {
+        preventionBtn.disabled = !preventionSelected;
+    }
+    
+    // Show completion modal and status only when ALL questions are correctly answered
+    if (audioFlagsAnswered && allTextMessagesChecked && responseAnswered && preventionAnswered) {
+        statusDiv.classList.add('all-done');
+        statusDiv.innerHTML = '✅ All questions answered! You can now view the completion screen.';
+        showCompletionMessage();
+    } else {
+        statusDiv.classList.remove('all-done');
+    }
+}
 
         function showCompletionMessage() {
             const completionModal = document.getElementById('completionModal');
-            if (completionModal) {
+            if (completionModal && audioFlagsAnswered && allTextMessagesChecked && responseAnswered && preventionAnswered) {
                 completionModal.classList.add('show');
             }
         }
 
         function backToCases() {
-            window.location.href = 'cases3.html';
+            // Only allow navigation if all tasks are complete
+            if (audioFlagsAnswered && allTextMessagesChecked && responseAnswered && preventionAnswered) {
+                window.location.href = 'cases3.html';
+            } else {
+                alert('Please complete all tasks before proceeding:\n- Answer all audio red flags correctly\n- Find all red flags in text messages\n- Answer the response question correctly\n- Answer the prevention question correctly');
+            }
         }
 
         window.onclick = function(event) {
@@ -1045,10 +1076,10 @@
             }
         }
 
-        // Enable prevention button when option is selected
+        // Enable response button when option is selected
         document.addEventListener('change', function(event) {
-            if (event.target.name === 'prevention') {
-                document.getElementById('preventionBtn').disabled = false;
+            if (event.target.name === 'response' || event.target.name === 'prevention') {
+                updateCompletionStatus();
             }
         });
     </script>

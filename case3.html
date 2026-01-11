@@ -326,10 +326,23 @@
             display: block;
             cursor: pointer;
             transition: transform 0.2s;
+            border: 2px solid #e50914;
         }
 
         .message-image:hover {
             transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+        }
+
+        .image-click-hint {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 8px;
+            font-weight: bold;
         }
 
         .ai-image-modal {
@@ -515,12 +528,12 @@
         </div>
 
         <div id="completionStatus" class="completion-status">
-            ⚠️ Complete all questions to finish the case: Red Flags ❌ | Response ❌ | Verification ❌ | Prevention ❌
+            Complete all questions to finish the case: AI Detection ❌ | Response ❌ | Prevention ❌ | Red Flags ❌
         </div>
 
         <!-- SMS Conversation Section -->
         <div class="sms-section">
-            <div class="sms-header">💬 Text Message Conversation</div>
+            <div class="sms-header">Text Message Conversation</div>
             <div class="sms-content">
                 <div class="conversation-thread">
                     <div class="message receiver">
@@ -561,12 +574,13 @@
                         <div class="message-bubble">If you don't want this sent to your followers, send $200 now.</div>
                     </div>
                 </div>
+                <div class="image-click-hint">💡 Click on the image in the conversation to analyze it and answer the AI detection question!</div>
             </div>
         </div>
 
-        <!-- Question 1: Red Flags -->
+        <!-- Red Flags -->
         <div class="question-section">
-            <h3>🚩 Question 1: Identify the Red Flags</h3>
+            <h3>Red Flags</h3>
             <p class="question-text">What are the main red flags in this sextortion attempt?</p>
             <div class="options">
                 <div class="option">
@@ -590,10 +604,10 @@
             <div id="redFlagsResult" class="result"></div>
         </div>
 
-        <!-- Question 2: What Should Sarah Do? -->
+        <!-- What Should Sarah Do? -->
         <div class="question-section">
-            <h3>💡 Question 2: What Should Sarah Do?</h3>
-            <p class="question-text">What is the best response to this sextortion attempt? (Select all that apply)</p>
+            <h3>What Should Sarah Do?</h3>
+            <p class="question-text">What is the BEST response to this sextortion attempt? (Select all that apply)</p>
             <div class="options">
                 <div class="option">
                     <input type="checkbox" id="response1" class="response" value="wrong">
@@ -620,35 +634,9 @@
             <div id="responseResult" class="result"></div>
         </div>
 
-        <!-- Question 3: Verification Method -->
+        <!-- How to Prevent Sextortion? -->
         <div class="question-section">
-            <h3>✅ Question 3: How Can Sarah Verify This Is a Scam?</h3>
-            <p class="question-text">Which statement is true about verifying this is a scam?</p>
-            <div class="options">
-                <div class="option">
-                    <input type="radio" id="verify1" name="verification" value="correct">
-                    <label for="verify1">Real intimate images would require her actual consent and participation</label>
-                </div>
-                <div class="option">
-                    <input type="radio" id="verify2" name="verification" value="wrong">
-                    <label for="verify2">The scammer's confidence means the images are real</label>
-                </div>
-                <div class="option">
-                    <input type="radio" id="verify3" name="verification" value="wrong">
-                    <label for="verify3">She should pay to verify if they will actually send the images</label>
-                </div>
-                <div class="option">
-                    <input type="radio" id="verify4" name="verification" value="correct">
-                    <label for="verify4">AI-generated images can be created without any real photos</label>
-                </div>
-            </div>
-            <button class="submit-btn" id="verificationBtn" onclick="checkVerification()" disabled>Submit Answer</button>
-            <div id="verificationResult" class="result"></div>
-        </div>
-
-        <!-- Question 4: Prevention -->
-        <div class="question-section">
-            <h3>🛡️ Question 4: How to Prevent Sextortion?</h3>
+            <h3>How to Prevent Sextortion?</h3>
             <p class="question-text">Which practices help prevent becoming a sextortion victim? (Select all that apply)</p>
             <div class="options">
                 <div class="option">
@@ -680,11 +668,8 @@
     <!-- AI Image Identification Modal -->
     <div id="aiImageModal" class="ai-image-modal">
         <div class="ai-image-modal-content">
-            <div class="ai-image-close">
-                <button onclick="closeAIImageModal()">Close</button>
-            </div>
             
-            <div class="ai-image-modal-header">🖼️ Is This AI-Generated?</div>
+            <div class="ai-image-modal-header">Is This AI-Generated?</div>
             
             <div class="ai-image-display">
                 <img src="womanai.jpg" alt="AI-generated image">
@@ -723,6 +708,9 @@
                 <button class="ai-submit-btn" id="aiIdentifyBtn" onclick="checkAIIdentification()" disabled>Check Answer</button>
                 <div id="aiIdentifyResult" class="ai-result"></div>
             </div>
+             <div class="ai-image-close">
+                <button onclick="closeAIImageModal()">Close</button>
+            </div>
         </div>
     </div>
 
@@ -730,8 +718,8 @@
         let correctAnswers = {
             redflags: 0,
             response: 0,
-            verification: 0,
-            prevention: 0
+            prevention: 0,
+            aiDetection: 0
         };
 
         let aiImageAnswered = false;
@@ -795,31 +783,6 @@
             updateCompletion();
         }
 
-        function checkVerification() {
-            const selected = document.querySelector('input[name="verification"]:checked');
-            const result = document.getElementById('verificationResult');
-            
-            if (!selected) {
-                result.innerHTML = '⚠️ Please select an answer';
-                result.classList.add('show');
-                return;
-            }
-            
-            result.classList.add('show');
-            if (selected.value === 'correct') {
-                result.innerHTML = '✓ <strong>Correct!</strong> Real images require participation, and AI can create fake ones.';
-                result.classList.add('correct');
-                result.classList.remove('incorrect');
-                correctAnswers.verification = 1;
-            } else {
-                result.innerHTML = '❌ Incorrect. AI-generated images don\'t need real photos - they\'re completely fake.';
-                result.classList.add('incorrect');
-                result.classList.remove('correct');
-                correctAnswers.verification = 0;
-            }
-            updateCompletion();
-        }
-
         function checkPrevention() {
             const selected = document.querySelectorAll('input.prevention:checked');
             const result = document.getElementById('preventionResult');
@@ -859,10 +822,10 @@
             
             const redFlagsStatus = correctAnswers.redflags ? '✓' : '❌';
             const responseStatus = correctAnswers.response ? '✓' : '❌';
-            const verificationStatus = correctAnswers.verification ? '✓' : '❌';
             const preventionStatus = correctAnswers.prevention ? '✓' : '❌';
+            const aiDetectionStatus = correctAnswers.aiDetection ? '✓' : '❌';
             
-            statusEl.innerHTML = `📋 Complete all questions to finish: Red Flags ${redFlagsStatus} | Response ${responseStatus} | Verification ${verificationStatus} | Prevention ${preventionStatus}`;
+            statusEl.innerHTML = `Complete all questions to finish: AI Detection ${aiDetectionStatus} | Red Flags ${redFlagsStatus} | Response ${responseStatus} | Prevention ${preventionStatus} `;
             
             if (totalCorrect === 4) {
                 statusEl.classList.add('all-done');
@@ -910,13 +873,16 @@
                 resultDiv.innerHTML = '✓ <strong>Correct!</strong> AI-generated images often have telltale signs like unnatural facial features, strange hands/fingers, odd text, or unrealistic proportions. Professional quality and lighting alone don\'t prove authenticity.';
                 resultDiv.classList.add('correct');
                 aiImageCorrect = true;
+                correctAnswers.aiDetection = 1;
             } else {
                 resultDiv.innerHTML = '❌ Incorrect. Look for unnatural features like asymmetrical faces, morphed hands, strange text/logos, and unrealistic body proportions. Professional quality doesn\'t mean it\'s real.';
                 resultDiv.classList.add('incorrect');
                 aiImageCorrect = false;
+                correctAnswers.aiDetection = 0;
             }
             
             aiImageAnswered = true;
+            updateCompletion();
         }
 
         // Enable/disable buttons based on selection
@@ -924,11 +890,6 @@
             // Red Flags question
             if (event.target.name === 'redflags') {
                 document.getElementById('redFlagsBtn').disabled = false;
-            }
-            
-            // Verification question
-            if (event.target.name === 'verification') {
-                document.getElementById('verificationBtn').disabled = false;
             }
             
             // Response checkboxes

@@ -463,9 +463,14 @@
             transition: all 0.3s;
         }
 
-        .completion-modal-button:hover {
+        .completion-modal-button:hover:not(:disabled) {
             background-color: #f0f0f0;
             transform: scale(1.05);
+        }
+
+        .completion-modal-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         @keyframes fadeIn {
@@ -496,16 +501,16 @@
         <div class="case-info">
             <div><span class="label">Profile:</span><span class="value">Daniel</span></div>
             <div><span class="label">Platform:</span><span class="value">Email</span></div>
-            <div><span class="label">Details:</span><span class="value">Hi, I got a email from Nextflix saying that my account is going to be suspended next month. Is this a scam?</span></div>
+            <div><span class="label">Details:</span><span class="value">Hi, I got a email from Netflix saying that my account is going to be suspended next month. Is this a scam?</span></div>
         </div>
 
         <div id="completionModal" class="completion-modal">
             <div class="completion-modal-content">
                 <span class="emoji">✅</span>
                 <h2>Case Completed!</h2>
-                <p>Excellent work! You successfully identified all 4 suspicious elements in the email AND provided the correct response.</p>
+                <p>Excellent work! You successfully identified all 4 red flags in the email AND provided the correct response.</p>
                 <p>You're now ready to spot phishing scams and protect your accounts!</p>
-                <button class="completion-modal-button" onclick="backToCases()">Back to Cases</button>
+                <button class="completion-modal-button" id="backToCasesBtn" onclick="backToCases()">Back to Cases</button>
             </div>
         </div>
 
@@ -518,9 +523,9 @@
         </div>
 
         <div class="email-section">
-            <div class="email-header">Suspicious Email from Netflix</div>
+            <div class="email-header">Email from Netflix</div>
             <div class="email-content">
-                <div class="email-from" onclick="clickWord(this, false)">From: <span class="clickable-word" onclick="clickWord(this, event)">Nextflix</span> <span class="clickable-word" onclick="clickWord(this, event)">Team</span> &lt;<span class="clickable-word" data-suspicious="true" data-info="email" data-group="email-group" onclick="clickWord(this, event)">Membership@Nextfl1x-alerts.com</span>&gt;</div>
+                <div class="email-from" onclick="clickWord(this, false)">From: <span class="clickable-word" onclick="clickWord(this, event)">Netflix</span> <span class="clickable-word" onclick="clickWord(this, event)">Team</span> &lt;<span class="clickable-word" data-suspicious="true" data-info="email" data-group="email-group" onclick="clickWord(this, event)">Membership@Netfl1x-alerts.com</span>&gt;</div>
                 
                 <div class="email-body">
 <span class="clickable-word" onclick="clickWord(this, event)">Hi</span> <span class="clickable-word" onclick="clickWord(this, event)">Daniel,</span>
@@ -535,7 +540,7 @@
                 <div class="email-body">
 <span class="clickable-word" onclick="clickWord(this, event)">We're</span> <span class="clickable-word" onclick="clickWord(this, event)">here</span> <span class="clickable-word" onclick="clickWord(this, event)">to</span> <span class="clickable-word" onclick="clickWord(this, event)">help</span> <span class="clickable-word" onclick="clickWord(this, event)">if</span> <span class="clickable-word" onclick="clickWord(this, event)">you</span> <span class="clickable-word" onclick="clickWord(this, event)">need</span> <span class="clickable-word" onclick="clickWord(this, event)">it.</span> <span class="clickable-word" onclick="clickWord(this, event)">Visit</span> <span class="clickable-word" onclick="clickWord(this, event)">the</span> <span class="fake-link" onclick="clickWord(this, event)">Help</span> <span class="fake-link" onclick="clickWord(this, event)">Center</span> <span class="clickable-word" onclick="clickWord(this, event)">for</span> <span class="clickable-word" onclick="clickWord(this, event)">more</span> <span class="clickable-word" onclick="clickWord(this, event)">info</span> <span class="clickable-word" onclick="clickWord(this, event)">or</span> <span class="fake-link" onclick="clickWord(this, event)">Contact</span> <span class="fake-link" onclick="clickWord(this, event)">Us</span>.
 
-- <span class="clickable-word" onclick="clickWord(this, event)">The</span> <span class="clickable-word" onclick="clickWord(this, event)">Nextflix</span> <span class="clickable-word" onclick="clickWord(this, event)">team</span>
+- <span class="clickable-word" onclick="clickWord(this, event)">The</span> <span class="clickable-word" onclick="clickWord(this, event)">Netflix</span> <span class="clickable-word" onclick="clickWord(this, event)">team</span>
                 </div>
             </div>
         </div>
@@ -572,7 +577,7 @@
     <div id="emailModal" class="modal">
         <div class="modal-content">
             <h2>❌ Fake Sender Email Address</h2>
-            <p><strong>Issue:</strong> The sender email "Membership@Nextfl1x-alerts.com" is fake</p>
+            <p><strong>Issue:</strong> The sender email "Membership@Netfl1x-alerts.com" is fake</p>
             <p>The domain uses a "1" instead of "i" and "-alerts" which Netflix would never use.</p>
             <p>Real Netflix uses domains like noreply@netflix.com or support@netflix.com</p>
             <button onclick="closeModal('emailModal')">Got it!</button>
@@ -604,7 +609,7 @@
             <h2>Website</h2>
             
             <div class="website-url">
-                https://<span class="clickable-word" data-suspicious="true" data-info="website" data-group="website-group" onclick="clickWord(this, event)">nextfl1x-account-support.com</span>/login
+                https://<span class="clickable-word" data-suspicious="true" data-info="website" data-group="website-group" onclick="clickWord(this, event)">netfl1x-account-support.com</span>/login
             </div>
 
             <div class="fake-website">
@@ -633,8 +638,8 @@
     <div id="websiteInfoModal" class="modal">
         <div class="modal-content">
             <h2>❌ Fake Website Domain</h2>
-            <p><strong>Issue:</strong> The link goes to "nextfl1x-account-support.com" not "netflix.com"</p>
-            <p><strong>Wrong Domain:</strong> Uses "nextfl1x-account-support.com" instead of netflix.com</p>
+            <p><strong>Issue:</strong> The link goes to "netfl1x-account-support.com" not "netflix.com"</p>
+            <p><strong>Wrong Domain:</strong> Uses "netfl1x-account-support.com" instead of netflix.com</p>
             <p><strong>Typosquatting:</strong> The "1" (number) replaces "i" to trick users</p>
             <p><strong>Fake Login Form:</strong> Designed to steal your email and password</p>
             <p><strong>Unsafe Connection:</strong> Real Netflix always uses secure domains</p>
@@ -727,6 +732,12 @@
             
             statusDiv.innerHTML = `📋 Complete all questions to finish: Red Flags ${suspiciousStatus} | Response ${responseStatus}`;
             
+            // Update button state
+            const btn = document.getElementById('backToCasesBtn');
+            if (btn) {
+                btn.disabled = groupsFound.size < 4 || !responseCorrect;
+            }
+            
             if (groupsFound.size === 4 && responseCorrect) {
                 statusDiv.classList.add('all-done');
                 statusDiv.innerHTML = '✅ All questions answered! You can now view the completion screen.';
@@ -761,28 +772,36 @@
                 resultDiv.classList.add('show', 'incorrect');
                 resultDiv.innerHTML = '<strong>❌ Consequences:</strong><br>Daniel\'s credentials are stolen. His Netflix account is compromised, and the scammers use his payment information to make unauthorized purchases. He also receives fraudulent charges on his credit card and must spend weeks disputing them with his bank.';
                 responseCorrect = false;
+                updateCompletionStatus();
             } else if (selected.value === 'c') {
                 // Replying to the email
                 resultDiv.classList.add('show', 'incorrect');
                 resultDiv.innerHTML = '<strong>❌ Consequences:</strong><br>By replying, Daniel confirms his email is active and monitored. The scammers now know he\'s a responsive target. They escalate their attacks with more sophisticated phishing emails and may sell his contact information to other scammers.';
                 responseCorrect = false;
+                updateCompletionStatus();
             } else if (selected.value === 'd') {
                 // Forwarding to friends
                 resultDiv.classList.add('show', 'incorrect');
                 resultDiv.innerHTML = '<strong>❌ Consequences:</strong><br>Daniel unknowingly spreads the scam to his friends and family. His friends fall for it, and Daniel\'s reputation is damaged. Multiple people lose money, and their accounts are compromised because Daniel didn\'t verify the email first.';
                 responseCorrect = false;
+                updateCompletionStatus();
             }
         }
 
         function showCompletionMessage() {
             const completionModal = document.getElementById('completionModal');
-            if (completionModal) {
+            if (completionModal && groupsFound.size === 4 && responseCorrect) {
                 completionModal.classList.add('show');
             }
         }
 
         function backToCases() {
-            window.location.href = 'cases2.html';
+            // Only allow navigation if all tasks are complete
+            if (groupsFound.size === 4 && responseCorrect) {
+                window.location.href = 'cases2.html';
+            } else {
+                alert('Please complete all tasks before proceeding:\n- Find all 4 red flags\n- Answer the response question correctly');
+            }
         }
 
         window.onclick = function(event) {
