@@ -37,7 +37,6 @@
             right: -960px;
             width: 100%;
             height: 100%;
-            animation: slideInRight 0.5s ease-out forwards;
         }
 
         #clickIndicator {
@@ -55,6 +54,15 @@
             }
             to {
                 right: 0;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                left: -960px;
+            }
+            to {
+                left: 0;
             }
         }
 
@@ -140,32 +148,6 @@
             animation: buttonPress 0.3s ease-out;
         }
 
-        .skip-intro-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background: rgba(200, 50, 50, 0.8);
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 14px;
-            font-family: Arial, sans-serif;
-            cursor: pointer;
-            z-index: 20;
-            transition: background 0.3s;
-            opacity: 0;
-            animation: fadeIn 0.6s ease-out 0.5s forwards;
-        }
-
-        .skip-intro-button:hover {
-            background: rgba(200, 50, 50, 1);
-        }
-
-        .skip-intro-button:active {
-            transform: scale(0.95);
-        }
-
         .dialogue-box {
             font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
             position: absolute;
@@ -220,30 +202,86 @@
             background-color: black;
             z-index: 1000;
             opacity: 1;
-            transition: opacity 2s ease-in-out;
+            transition: opacity 1.2s ease-in-out;
         }
         .black-screen.fade-out {
             opacity: 0;
             pointer-events: none;
+        }
+
+        .end-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(25, 55, 109, 0.95), rgba(35, 75, 140, 0.95));
+            display: none;
+            z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+
+        .end-screen.show {
+            display: flex;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .end-screen h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-family: 'Lucida Sans', sans-serif;
+        }
+
+        .end-screen p {
+            font-size: 20px;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            font-family: Arial, sans-serif;
+        }
+
+        .end-button {
+            padding: 12px 30px;
+            background: rgba(100, 150, 200, 0.8);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 10px;
+        }
+
+        .end-button:hover {
+            background: rgba(100, 150, 200, 1);
         }
     </style>
 </head>
 <body>
     <div class="image-container">
         <div id="blackScreen" class="black-screen"></div>
-        <img id="mainImage" src="calling.png" alt="Description of image">
+        <img id="mainImage" src="phone.png" alt="Description of image">
         <img id="overlayImage" src="" alt="Overlay" style="display: none;">
         <div id="clickIndicator" style="display: none;">↓</div>
         <div id="dialogueBox" class="dialogue-box">
-            <div id="speakerName" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: bold; margin-bottom: 10px; font-size: 20px; letter-spacing: 0.5px;">You</div>
-            <div id="dialogueText">Who is calling me at this time?</div>
+            <div id="speakerName" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: bold; margin-bottom: 10px; font-size: 20px; letter-spacing: 0.5px;">Jack</div>
+            <div id="dialogueText">Wow</div>
         </div>
         <button id="nextButton" class="next-arrow" onclick="nextDialogue()">→</button>
-        <button id="skipIntroButton" class="skip-intro-button" onclick="skipIntro()">Skip Intro</button>
+        
+        <div id="endScreen" class="end-screen">
+            <h1>Game Complete</h1>
+            <p>Thank you for playing! You've successfully completed the scam awareness training. Remember to always verify before you panic.</p>
+            <button class="end-button" onclick="location.href='index.html'">Return to Title Screen</button>
+        </div>
         
         <!-- Image map for clickable area -->
         <div id="imageMapContainer" class="image-map-container">
-            <img id="mappedImage" src="calling.png" usemap="#image-map" style="width: 100%; height: 100%;">
+            <img id="mappedImage" src="phone.png" usemap="#image-map" style="width: 100%; height: 100%;">
             <map name="image-map">
                 <area id="clickArea" target="" alt="" title="" href="javascript:void(0);" coords="423,333,437,361,579,347,557,321" shape="poly" onclick="clickedArea()">
             </map>
@@ -259,20 +297,29 @@
         let typingTimeout = null;
 
         const dialogues = [
-            { speaker: "You", text: "Who is calling me at this time?", image: "calling.png", type: "dialogue" },
-            { image: "calling.png", type: "clickable", coords: "423,333,437,361,579,347,557,321" },
-            { speaker: "Lily", text: "Hey, hey, are you awake?", image: "calling.png", overlayImage: "open2.png", type: "dialogue" },
-            { speaker: "You", text: "Huh, why are you calling me?", image: "o.png", type: "dialogue" },
-            { speaker: "Lily", text: "You asked me to remind you to go for your first shift today.", image: "smile.png", type: "dialogue" },
-            { speaker: "You", text: "(Oh, right, that)", image: "closedsmile.png", type: "dialogue" },
-            { speaker: "You", text: "(I signed up to volunteer for some scam helpline with her)", image: "closedsmile.png", type: "dialogue" },
-            { speaker: "You", text: "(Why did I take the midnight shift...)", image: "closedsmile.png", type: "dialogue" },
-            { speaker: "Lily", text: "I sent you a copy of the the manual that you lost. Make sure to actually look through it this time. Good luck!", image: "smile.png", type: "dialogue" },
-            { speaker: "You", text: "(She hung up, guess it's time to login to the system)", image: "phone.png", type: "dialogue" },
-            { image: "phone.png", type: "clickable", coords: "288,34,281,218,233,303,620,316,614,223,615,75,601,58,609,37", link: "actually_code.html" }
+            { speaker: "Jack", text: "Wow\nDo you really think I'd scam you?", image: "phone.png", overlayImage: "slideinman.png", overlayAnimation: "slideInRight", type: "dialogue" },
+            { speaker: "You", text: "The message felt off.", image: "manpuzzled.png", type: "dialogue" },
+            { speaker: "Jack", text: "Off how?", image: "manpuzzled.png", type: "dialogue" },
+            { speaker: "You", text: "You typed in full sentences.\nWith punctuation.", image: "maneyes.png", type: "dialogue" },
+            { speaker: "Jack", text: "Okay wow\nCaught", image: "mansmile.png", type: "dialogue" },
+            { speaker: "You", text: "You usually type in lowercase.", image: "mansmile.png", type: "dialogue" },
+            { speaker: "Jack", text: "That's fair\nMy autocorrect's on", image: "mansmile.png", type: "dialogue" },
+            { speaker: "You", text: "Since when do you have autocorrect on?", image: "mansmile.png", type: "dialogue" },
+            { speaker: "Jack", text: "Since my phone keeps bullying my spelling", image: "maneyes.png", type: "dialogue" },
+            { speaker: "You", text: "So the game isn't real.", image: "maneyes.png", type: "dialogue" },
+            { speaker: "Jack", text: "Nope\nThere is no game", image: "mansmile.png", type: "dialogue" },
+            { speaker: "You", text: "You were testing me.", image: "mansmile.png", type: "dialogue" },
+            { speaker: "Jack", text: "Yep", image: "maneyes.png", type: "dialogue" },
+            { speaker: "Lily", text: "And before you get mad\nThis was my idea", image: "maneyes.png", overlayImage: "slidein.png", overlayAnimation: "slideInLeft", type: "dialogue" },
+            { speaker: "You", text: "Lily?", image: "mansmilegirlclosed.png", type: "dialogue" },
+            { speaker: "Jack", text: "She literally took notes", image: "mansmilegirlclosed.png", type: "dialogue" },
+            { speaker: "You", text: "So both of you set me up.", image: "mansmilegirlclosed.png", type: "dialogue" },
+            { speaker: "Lily", text: "Yep.\nBut in a loving, educational way.", image: "smilegirlman.png", type: "dialogue" },
+            { speaker: "Jack", text: "If it were a real scammer,\nThey would've told you not to call", image: "smilegirlman.png", type: "dialogue" },
+            { speaker: "Lily", text: "And they wouldn't survive a two-minute phone call.", image: "smilegirlman.png", type: "dialogue" }
         ];
 
-        // Start the intro when page loads
+        // Start the conversation when page loads
         window.addEventListener('load', function() {
             const blackScreen = document.getElementById('blackScreen');
             
@@ -283,18 +330,27 @@
                 // Remove black screen after fade completes
                 setTimeout(() => {
                     blackScreen.style.display = 'none';
-                    // Start typing animation for first dialogue after intro
+                    // Start typing animation for first dialogue
                     const current = dialogues[currentDialogue];
                     const dialogueBox = document.getElementById('dialogueBox');
                     const nextButton = document.getElementById('nextButton');
+                    const overlayImage = document.getElementById('overlayImage');
+                    
                     if (current.type === "dialogue") {
+                        // Show overlay image if it exists
+                        if (current.overlayImage) {
+                            overlayImage.src = current.overlayImage;
+                            overlayImage.style.display = 'block';
+                            overlayImage.style.animation = current.overlayAnimation + ' 0.5s ease-out forwards';
+                        }
+                        
                         dialogueBox.classList.add('fade-in');
                         nextButton.classList.add('fade-in');
                         document.getElementById('speakerName').textContent = current.speaker;
                         typeText(current.text);
                     }
-                }, 2000);
-            }, 1000);
+                }, 1200);
+            }, 500);
         });
 
         function typeText(text, callback) {
@@ -362,7 +418,8 @@
             // Second click (not typing): advance to next dialogue
             currentDialogue++;
             if (currentDialogue >= dialogues.length) {
-                // Do nothing when reaching the end
+                // Show end screen
+                showEndScreen();
                 return;
             }
             
@@ -381,9 +438,17 @@
             }
         }
 
-        function skipIntro() {
-            // Jump to cases.html
-            window.location.href = "cases.html";
+        function showEndScreen() {
+            const endScreen = document.getElementById('endScreen');
+            const dialogueBox = document.getElementById('dialogueBox');
+            const nextButton = document.getElementById('nextButton');
+            const mainImage = document.getElementById('mainImage');
+            
+            dialogueBox.style.display = 'none';
+            nextButton.style.display = 'none';
+            mainImage.style.display = 'none';
+            
+            endScreen.classList.add('show');
         }
 
         function updateDisplay() {
@@ -428,7 +493,7 @@
                     // Reset animation
                     overlayImage.style.animation = 'none';
                     setTimeout(() => {
-                        overlayImage.style.animation = 'slideInRight 0.5s ease-out forwards';
+                        overlayImage.style.animation = current.overlayAnimation + ' 0.5s ease-out forwards';
                     }, 10);
                 } else {
                     overlayImage.style.display = 'none';

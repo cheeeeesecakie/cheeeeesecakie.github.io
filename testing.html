@@ -15,7 +15,7 @@
                 display:flex;
                 justify-content: center;
                 align-items: center;
-                background:#F0F0F0;
+                background:aliceblue;
                 font-family: Verdana, Geneva, Tahoma, sans-serif;
                 overflow:hidden;
             }
@@ -58,6 +58,12 @@
                 }
             }
         </style>
+
+        <audio id="bg-music" loop autoplay>
+    <source src="jazz.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
     </head>
     <body>
         <div id="overlay"><div><svg fill="#ffffff" width="150" height="150" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 214.367 214.367" xml:space="preserve">
@@ -67,6 +73,32 @@
            S202.403,42.716,202.403,95.22z"></path>
        </svg><h1>Please rotate your screen</h1></div></div>
        <!-- rename your homepage or update the src below --> 
-       <div id="container"><iframe src="intro1.html"></iframe></div>
+       <div id="container"><iframe src="title-screen.html"></iframe></div>
+
+       <script> const audio = document.getElementById('bg-music');
+
+// Set volume here (0.1 = 10%, 0.5 = 50%, etc.)
+audio.volume = 0.1;
+
+// Function to play audio
+const playMusic = () => {
+  if (audio.paused) {
+    audio.play().catch(e => console.log("Playback blocked: " + e));
+  }
+};
+
+// 1. Listen for clicks on the parent page
+window.addEventListener('click', playMusic, { once: true });
+
+// 2. Listen for interaction with the iframe
+// This checks every 500ms if the "active element" is the iframe
+const monitorIframeClick = setInterval(() => {
+  if (document.activeElement.tagName === 'IFRAME') {
+    playMusic();
+    // Once playing, we can stop checking to save performance
+    clearInterval(monitorIframeClick);
+  }
+}, 500);
+</script>
     
 </body></html>

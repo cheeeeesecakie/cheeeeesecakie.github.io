@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scam Helpline - Cases</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+
+        .container {
+            background: white;
+            box-shadow: 0 10px 60px rgba(0, 0, 0, 0.3);
+            width: 960px;
+            height: 540px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 3px solid #1e8449;
+        }
+
+        .logo {
+            font-size: 35px;
+        }
+
+        .header-content h1 {
+            font-size: 22px;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .header-content p {
+            font-size: 11px;
+            opacity: 0.9;
+            margin: 2px 0 0 0;
+        }
+
+        .content {
+            flex: 1;
+            padding: 25px 30px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .case-card {
+            background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #95a5a6;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            position: relative;
+        }
+
+        .case-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+            background: linear-gradient(135deg, #d5dbdb, #a6acaf);
+            border-color: #27ae60;
+        }
+
+        .case-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .case-card.disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+            border-color: #95a5a6;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #27ae60;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .case-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .case-card h2 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .case-card p {
+            color: #555;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .footer {
+            background: #ecf0f1;
+            padding: 10px 30px;
+            text-align: center;
+            border-top: 1px solid #bdc3c7;
+            font-size: 11px;
+            color: #7f8c8d;
+        }
+
+        /* Notification Toast */
+        .notification-toast {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: white;
+            border-left: 5px solid #e74c3c;
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            animation: slideIn 0.4s ease-out;
+            cursor: pointer;
+            max-width: 300px;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .notification-toast:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .notification-toast .sender-name {
+            font-weight: 700;
+            color: #e74c3c;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .notification-toast .message-preview {
+            color: #555;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .notification-toast .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .notification-toast .close-btn:hover {
+            color: #333;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(350px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">📱</div>
+            <div class="header-content">
+                <h1>Scam Helpline</h1>
+                <p>Case Management System</p>
+            </div>
+        </div>
+
+        <!-- Jack Notification Toast -->
+        <div class="notification-toast" id="jackNotification" onclick="window.location.href='finalcase.html'">
+            <button class="close-btn" onclick="event.stopPropagation(); document.getElementById('jackNotification').style.display='none';">✕</button>
+            <div class="sender-name">💬 Jack</div>
+            <div class="message-preview">Hey, check out this new game!</div>
+        </div>
+
+        <div class="content">
+            <div style="text-decoration: none;">
+                <div class="case-card disabled">
+                    <div class="status-badge">✓ Completed</div>
+                    <div class="case-icon">📋</div>
+                    <h2>Case 1</h2>
+                    <p>Daniel - Netflix Email</p>
+                </div>
+            </div>
+
+            <a href="" style="text-decoration: none;">
+                <div class="case-card disabled">
+                    <div class="status-badge">✓ Completed</div>
+                    <div class="case-icon">📋</div>
+                    <h2>Case 2</h2>
+                    <p>Linda - SMS & Call From Relative</p>
+                </div>
+            </a>
+
+            <div style="text-decoration: none;">
+                <div class="case-card disabled">
+                    <div class="status-badge">✓ Completed</div>
+                    <div class="case-icon">📋</div>
+                    <h2>Case 3</h2>
+                    <p>Sarah - AI Sextortion Scam</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            © 2024 Scam Helpline. All rights reserved.
+        </div>
+    </div>
+
+    <script>
+        // Auto-show notification after page loads
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const notification = document.getElementById('jackNotification');
+                if (notification) {
+                    notification.style.display = 'block';
+                }
+            }, 500); // Show notification after 0.5 seconds
+        });
+    </script>
+</body>
+</html>

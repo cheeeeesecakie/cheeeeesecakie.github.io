@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messages</title>
+    <title>Messages - Jack Conversation</title>
     <style>
         * {
             margin: 0;
@@ -25,66 +25,88 @@
         .screen {
             width: 960px;
             height: 540px;
-            background: white;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             display: flex;
             flex-direction: column;
             box-shadow: 0 10px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
 
-        @keyframes slideInMessage {
-            0% {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        .message.new-message {
-            animation: slideInMessage 0.6s ease-out, pulse 0.8s ease-in-out 2;
-        }
-
-        .contact-item.new-message-notification {
-            animation: pulse 1s ease-in-out infinite;
-            background: rgba(231, 76, 60, 0.1) !important;
-        }
-
-        /* Messages App Container */
-        .messages-app-container {
-            display: flex;
-            width: 100%;
-            height: 100%;
+        .app-modal {
+            display: none;
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            transform: none;
             background: white;
-        }
-
-        /* Contacts List */
-        .contacts-panel {
-            width: 280px;
-            background: #f8f9fa;
-            border-right: 2px solid #e9ecef;
-            display: flex;
+            width: 960px;
+            height: 540px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
             flex-direction: column;
             overflow: hidden;
         }
 
+        .app-modal.active {
+            display: flex;
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            background: #2c3e50;
+            border-bottom: 2px solid #34495e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .modal-content {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        .messages-app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .contacts-panel {
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
         .contacts-header {
-            padding: 18px 20px;
-            font-size: 20px;
+            padding: 15px 20px;
             font-weight: 700;
-            border-bottom: 2px solid #dee2e6;
+            font-size: 32px;
             color: #2c3e50;
+            border-bottom: 1px solid #e9ecef;
         }
 
         .contacts-list {
@@ -93,198 +115,253 @@
         }
 
         .contact-item {
-            padding: 14px 20px;
-            border-bottom: 1px solid #e9ecef;
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
             cursor: pointer;
             transition: background 0.2s;
             position: relative;
         }
 
         .contact-item:hover {
-            background: #e9ecef;
+            background: #f5f5f5;
         }
 
         .contact-item.active {
-            background: #d0e8f2;
-            border-left: 5px solid #3498db;
+            background: #e8f4f8;
         }
 
         .contact-item.disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            background: #f0f0f0;
         }
 
         .contact-item.disabled:hover {
-            background: #f0f0f0;
+            background: transparent;
         }
 
         .contact-name {
             font-weight: 600;
             color: #2c3e50;
             margin-bottom: 4px;
-            font-size: 14px;
         }
 
         .contact-preview {
-            font-size: 12px;
-            color: #7f8c8d;
+            font-size: 13px;
+            color: #95a5a6;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
-        /* Contact Notification Indicator */
         .contact-notification {
             position: absolute;
-            top: 50%;
-            right: 12px;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
-            background: #e74c3c;
+            width: 12px;
+            height: 12px;
+            background: #27ae60;
             border-radius: 50%;
+            bottom: 15px;
+            right: 15px;
+            display: none;
         }
 
-        /* Chat Area */
         .chat-panel {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: white;
+            background: #fff;
         }
 
         .chat-header {
-            padding: 14px 20px;
+            padding: 15px 20px;
             border-bottom: 2px solid #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             background: #f8f9fa;
         }
 
         .chat-header-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
 
-        .chat-header-info h2 {
+        .chat-header h2 {
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 3px;
             color: #2c3e50;
+            margin: 0;
         }
 
-        .chat-header-info p {
-            font-size: 13px;
-            color: #7f8c8d;
+        .chat-header p {
+            font-size: 12px;
+            color: #95a5a6;
+            margin: 0;
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 15px 20px;
+            padding: 20px;
+            background: #fff;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background: #ffffff;
         }
 
         .message {
             display: flex;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             align-items: flex-end;
-            gap: 8px;
-        }
-
-        .message.received {
-            justify-content: flex-start;
         }
 
         .message.sent {
             justify-content: flex-end;
         }
 
+        .message.received {
+            justify-content: flex-start;
+        }
+
+        .message.system {
+            justify-content: center;
+            margin: 10px 0;
+        }
+
         .message-content {
-            max-width: 65%;
-            padding: 10px 14px;
+            max-width: 60%;
+            padding: 12px 16px;
             border-radius: 18px;
             word-wrap: break-word;
             font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .received .message-content {
-            background: #e9ecef;
-            color: #2c3e50;
+            line-height: 1.4;
         }
 
         .sent .message-content {
             background: #3498db;
             color: white;
+            border-bottom-right-radius: 4px;
         }
 
-        .message-content a {
-            color: #2980b9;
-            text-decoration: underline;
-            cursor: pointer;
+        .received .message-content {
+            background: #ecf0f1;
+            color: #2c3e50;
+            border-bottom-left-radius: 4px;
         }
 
-        .message-content a:hover {
-            color: #1f618d;
+        .system .message-content {
+            background: #ffffcc;
+            color: #856404;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            max-width: 80%;
+            text-align: center;
+            font-weight: 500;
         }
 
-        .message-attachment {
-            max-width: 65%;
-            padding: 8px 0;
-        }
-
-        .pdf-file {
-            background: #f8f9fa;
-            border: 2px solid #dee2e6;
-            border-radius: 12px;
-            padding: 12px;
+        .typing-indicator {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
+            gap: 4px;
+            padding: 12px 16px;
+            background: #ecf0f1;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            width: fit-content;
         }
 
-        .pdf-file:hover {
-            background: #e9ecef;
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #95a5a6;
+            opacity: 0.5;
+            animation: typing 1.4s infinite;
         }
 
-        .pdf-icon {
-            width: 35px;
-            height: 45px;
-            background: #e74c3c;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-            flex-shrink: 0;
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
         }
 
-        .pdf-info {
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.5;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-8px);
+            }
+        }
+
+        .message-options {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 8px;
+            max-width: 100%;
+            width: 100%;
         }
 
-        .pdf-name {
-            font-weight: 600;
+        .option-button {
+            background: white;
             color: #2c3e50;
+            border: 2px solid #3498db;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
             font-size: 13px;
+            transition: all 0.2s;
+            text-align: left;
+            font-family: inherit;
+            font-weight: 500;
         }
 
-        .pdf-size {
-            font-size: 12px;
-            color: #7f8c8d;
+        .option-button:hover {
+            background: #3498db;
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .option-button:active {
+            transform: translateX(2px);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 100%;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .action-button {
+            background: #27ae60;
+            color: white;
+            border: 2px solid #27ae60;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            text-align: center;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        .action-button:hover {
+            background: #229954;
+            border-color: #229954;
+        }
+
+        .action-button.replay {
+            background: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .action-button.replay:hover {
+            background: #c0392b;
+            border-color: #c0392b;
         }
 
         .chat-input-area {
@@ -332,121 +409,6 @@
             background: #2980b9;
         }
 
-        /* PDF Modal */
-        .pdf-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0,0,0,0.7);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pdf-modal.active {
-            display: flex;
-        }
-
-        .pdf-modal-content {
-            background: white;
-            width: 85%;
-            max-width: 720px;
-            height: 480px;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 5px 40px rgba(0,0,0,0.16);
-        }
-
-        .pdf-modal-header {
-            padding: 18px 20px;
-            border-bottom: 2px solid #dee2e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f8f9fa;
-            border-radius: 15px 15px 0 0;
-        }
-
-        .pdf-modal-header h2 {
-            font-size: 17px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .pdf-close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #7f8c8d;
-        }
-
-        .pdf-viewer {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            background: #ecf0f1;
-            border-radius: 0 0 15px 15px;
-        }
-
-        .pdf-page {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .pdf-title {
-            font-size: 22px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 22px;
-            color: #2c3e50;
-        }
-
-        .pdf-section {
-            margin-bottom: 18px;
-        }
-
-        .pdf-section-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-
-        .pdf-section-content {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #34495e;
-        }
-
-        .pdf-list {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .pdf-list li {
-            padding: 8px 0 8px 22px;
-            position: relative;
-            color: #34495e;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .pdf-list li:before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: #3498db;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
         .no-chat-selected {
             flex: 1;
             display: flex;
@@ -476,132 +438,74 @@
 </head>
 <body>
     <div class="screen">
-        <div class="messages-app-container">
-            <!-- Contacts List -->
-            <div class="contacts-panel">
-                <div class="contacts-header">Messages</div>
-                <div class="contacts-list">
-                    <div class="contact-item active" onclick="selectContact(0, this)">
-                        <div class="contact-name">Lily</div>
-                        <div class="contact-preview">Good luck on your shift 🎉</div>
-                        <div class="contact-notification" style="display: none;"></div>
-                    </div>
-                    <div class="contact-item" onclick="selectContact(1, this)">
-                        <div class="contact-name">Jack</div>
-                        <div class="contact-preview">could you send me your pdf after...</div>
-                    </div>
-                    <div class="contact-item disabled" id="scamHelplineContact" onclick="selectContact(2, this)">
-                        <div class="contact-name">Scam Helpline Volunteers</div>
-                        <div class="contact-preview">Here is the link to the portal...</div>
-                        <div class="contact-notification" style="display: none;"></div>
-                    </div>
-                </div>
+        <div class="app-modal" id="messages-modal" class="active">
+            <div class="modal-header">
+                <h2>Messages</h2>
             </div>
-
-            <!-- Chat Panel -->
-            <div class="chat-panel">
-                <div id="chatHeader" class="chat-header">
-                    <div class="chat-header-info">
-                        <div>
-                            <h2>Select a contact</h2>
+            <div class="modal-content">
+                <div class="messages-app-container">
+                    <div class="contacts-panel">
+                        <div class="contacts-header">Messages</div>
+                        <div class="contacts-list">
+                            <div class="contact-item active" onclick="selectContact(0, this)">
+                                <div class="contact-name">Jack</div>
+                                <div class="contact-preview">Check out this new game!</div>
+                                <div class="contact-notification"></div>
+                            </div>
+                            <div class="contact-item disabled" onclick="selectContact(1, this)">
+                                <div class="contact-name">Lily</div>
+                                <div class="contact-preview">Good luck on your shift</div>
+                                <div class="contact-notification" style="display: none;"></div>
+                            </div>
+                            <div class="contact-item disabled" onclick="selectContact(2, this)">
+                                <div class="contact-name">Scam Helpline Volunteers</div>
+                                <div class="contact-preview">Here is the link to the portal...</div>
+                                <div class="contact-notification" style="display: none;"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="chatMessages" class="chat-messages">
-                    <div class="no-chat-selected">Select a contact to view messages</div>
-                </div>
+                    <div class="chat-panel">
+                        <div id="chatHeader" class="chat-header">
+                            <div class="chat-header-info">
+                                <div>
+                                    <h2>Select a contact</h2>
+                                </div>
+                            </div>
+                        </div>
 
-                <div id="chatInputArea" class="chat-input-area" style="display: none;">
-                    <input type="text" class="chat-input" placeholder="Message...">
-                    <button class="send-btn">➤</button>
+                        <div id="chatMessages" class="chat-messages">
+                            <div class="no-chat-selected">Select a contact to view messages</div>
+                        </div>
+
+                        <div id="chatInputArea" class="chat-input-area" style="display: none;">
+                            <input type="text" class="chat-input" placeholder="Message...">
+                            <button class="send-btn">></button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PDF Modal -->
-    <div id="pdfModal" class="pdf-modal">
-        <div class="pdf-modal-content">
-            <div class="pdf-modal-header">
-                <h2>Scam Helpline Manual</h2>
-                <button class="pdf-close-btn" onclick="closePdfModal()">✕</button>
-            </div>
-            <div class="pdf-viewer">
-                <div class="pdf-page">
-                    <div class="pdf-title">SCAM HELPLINE MANUAL</div>
-                    
-                    <div class="pdf-section">
-                        <div class="pdf-section-title">1. Introduction</div>
-                        <div class="pdf-section-content">
-                            Welcome to the Scam Helpline team! This manual provides comprehensive guidelines for responding to calls and assisting victims of scams. Our mission is to help people protect themselves and understand common fraud tactics.
-                        </div>
-                    </div>
-
-                    <div class="pdf-section">
-                        <div class="pdf-section-title">2. Common Scam Types</div>
-                        <ul class="pdf-list">
-                            <li><strong>Phishing Scams:</strong> Fraudulent emails or texts requesting personal information</li>
-                            <li><strong>Tech Support Scams:</strong> False claims of computer viruses or technical issues</li>
-                            <li><strong>Romance Scams:</strong> Building relationships to extract money or personal information</li>
-                            <li><strong>Lottery/Prize Scams:</strong> Claiming the victim has won something they didn't enter</li>
-                            <li><strong>IRS/Tax Scams:</strong> Impersonating tax authorities demanding immediate payment</li>
-                        </ul>
-                    </div>
-
-                    <div class="pdf-section">
-                        <div class="pdf-section-title">3. Call Handling Procedures</div>
-                        <ul class="pdf-list">
-                            <li>Listen empathetically to the caller's situation</li>
-                            <li>Ask clarifying questions to understand the scam</li>
-                            <li>Provide information about the specific scam type</li>
-                            <li>Advise on immediate protective steps</li>
-                            <li>Direct to appropriate authorities if needed</li>
-                        </ul>
-                    </div>
-
-                    <div class="pdf-section">
-                        <div class="pdf-section-title">4. Resources & Support</div>
-                        <div class="pdf-section-content">
-                            Familiarize yourself with local law enforcement contacts, FTC guidelines, and support resources for victims. Keep detailed notes on each call for follow-up and reporting purposes.
-                        </div>
-                    </div>
-
-                    <div class="pdf-section">
-                        <div class="pdf-section-title">5. Code of Conduct</div>
-                        <ul class="pdf-list">
-                            <li>Maintain confidentiality of all caller information</li>
-                            <li>Remain professional and patient with all callers</li>
-                            <li>Never pressure or judge victims</li>
-                            <li>Follow all company protocols and compliance guidelines</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="overlay" id="overlay" onclick="closeApp()"></div>
 
     <script>
-        let lilyViewed = false;
-        let pdfRead = false;
+        let conversationState = 'initial';
+        let isWrongChoice = false;
 
         const contacts = [
+            {
+                name: "Jack",
+                status: "online",
+                messages: []
+            },
             {
                 name: "Lily",
                 status: "online",
                 messages: [
-                    { type: "received", text: "Here's the manual, don't lose this one 🤣" },
-                    { type: "message-attachment", pdf: true, fileName: "Scam_Helpline_Manual.pdf", fileSize: "2.4 MB" },
-                    { type: "received", text: "Good luck on your shift 🎉" }
-                ]
-            },
-            {
-                name: "Jack",
-                status: "offline",
-                messages: [
-                    { type: "received", text: "have you finished the assignment?" },
-                    { type: "sent", text: "almost" },
-                    { type: "received", text: "could you send me your pdf after youre done, thanks 😎" }
+                    { type: "received", text: "Here's the manual, don't lose this one" },
+                    { type: "received", text: "Good luck on your shift" }
                 ]
             },
             {
@@ -611,25 +515,34 @@
                     { type: "received", text: "Thanks for signing up to be a volunteer for the Scam Helpline!" },
                     { type: "received", text: "Your commitment to helping others avoid fraud is invaluable to our mission." },
                     { type: "received", text: "We're excited to have you on the team and looking forward to working together to protect our community." },
-                    { type: "received", text: 'Here is the link to the scam helpline login portal: <a href="portal.html" onclick="window.location.href=\'portal.html\'; return false;">scamhelplinevolunteerloginportal.com</a>' }
+                    { type: "received", text: 'Here is the link to the scam helpline login portal: scamhelplinevolunteerloginportal.com' }
                 ]
             }
         ];
 
-        // Load Lily's messages on page load
         window.addEventListener('load', function() {
-            selectContact(0, document.querySelector('.contact-item.active'));
-            
-            // Trigger new message from Jack after 3 seconds
-            setTimeout(() => {
-                addNewMessageFromJack();
-            }, 3000);
+            selectContact(0, document.querySelectorAll('.contact-item')[0]);
+            initializeConversation();
+            document.getElementById('messages-modal').classList.add('active');
         });
 
+        function initializeConversation() {
+            conversationState = 'initial';
+            isWrongChoice = false;
+            contacts[0].messages = [
+                { type: "received", text: "have you finished the assignment?" },
+                { type: "sent", text: "Almost" },
+                { type: "received", text: "could you send me your pdf after you're done, thanks 😎" },
+                { type: "received", text: "Hey, check out this new game!" },
+                { type: "received", text: "Gamelink.com" },
+                { type: "received", text: "I've been playing for a few days now and I need friends to get better resources.", choices: true }
+            ];
+            renderChat();
+        }
+
         function selectContact(index, element) {
-            // Check if trying to access Scam Helpline Volunteers (index 2) before viewing Lily
-            if (index === 2 && !lilyViewed) {
-                return; // Prevent access
+            if (index !== 0) {
+                return;
             }
 
             document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
@@ -637,8 +550,6 @@
 
             const contact = contacts[index];
             const chatHeader = document.getElementById('chatHeader');
-            const chatMessages = document.getElementById('chatMessages');
-            const chatInputArea = document.getElementById('chatInputArea');
 
             chatHeader.innerHTML = `
                 <div class="chat-header-info">
@@ -649,116 +560,330 @@
                 </div>
             `;
 
+            renderChat();
+        }
+
+        function renderChat() {
+            const chatMessages = document.getElementById('chatMessages');
+            const contact = contacts[0];
+
             chatMessages.innerHTML = '';
-            contact.messages.forEach(msg => {
-                if (msg.type === 'message-attachment' && msg.pdf) {
-                    const attachmentDiv = document.createElement('div');
-                    attachmentDiv.className = 'message received';
-                    attachmentDiv.innerHTML = `
-                        <div class="message-attachment">
-                            <div class="pdf-file" onclick="openPdfModal()">
-                                <div class="pdf-icon">PDF</div>
-                                <div class="pdf-info">
-                                    <div class="pdf-name">${msg.fileName}</div>
-                                    <div class="pdf-size">${msg.fileSize}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(attachmentDiv);
-                } else {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = `message ${msg.type}`;
-                    messageDiv.innerHTML = `<div class="message-content">${msg.text}</div>`;
-                    chatMessages.appendChild(messageDiv);
+            
+            contact.messages.forEach((msg, index) => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.type}`;
+                messageDiv.innerHTML = `<div class="message-content">${msg.text}</div>`;
+                chatMessages.appendChild(messageDiv);
+
+                if (msg.choices && !isWrongChoice) {
+                    const choicesDiv = document.createElement('div');
+                    choicesDiv.className = 'message-options';
+                    
+                    const choices = getChoicesForState(conversationState);
+                    choices.forEach(choice => {
+                        const btn = document.createElement('button');
+                        btn.className = 'option-button';
+                        btn.textContent = choice.text;
+                        btn.onclick = () => handleChoice(choice.value);
+                        choicesDiv.appendChild(btn);
+                    });
+
+                    chatMessages.appendChild(choicesDiv);
                 }
             });
 
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            chatInputArea.style.display = 'flex';
+        }
 
-            // Mark Lily as viewed when her contact is selected
-            if (index === 0) {
-                lilyViewed = true;
-                // Enable the Scam Helpline Volunteers contact
-                const scamContact = document.getElementById('scamHelplineContact');
-                if (scamContact) {
-                    scamContact.classList.remove('disabled');
-                }
-            }
+        function getChoicesForState(state) {
+            const choices = {
+                'initial': [
+                    { text: "Why are you using proper punctuation?", value: 'punctuation' },
+                    { text: "That sounds fun!", value: 'agreeing' },
+                    { text: "That link looks suspicious.", value: 'suspicious' }
+                ],
+                'punctuation_branch': [
+                    { text: "I'll call you to confirm.", value: 'call_verify' },
+                ],
+                'agreeing_branch': [
+                    { text: "Okay, I'll try it.", value: 'try_it' },
+                    { text: "Can you send me more details?", value: 'more_details' }
+                ],
+                'suspicious_branch': [
+                    { text: "I don't recognise the domain.", value: 'domain' },
+                    { text: "Games usually come from app stores.", value: 'appstore' },
+                    { text: "You never mentioned this game before.", value: 'never_mentioned' }
+                ]
+            };
+            return choices[state] || [];
+        }
 
-            // Clear notification when contact is selected
-            if (index === 0 || index === 2) {
-                clearNotification(index);
+        function addTypingIndicator() {
+            const chatMessages = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message received';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typingDiv = document.getElementById('typing-indicator');
+            if (typingDiv) {
+                typingDiv.remove();
             }
         }
 
-        function clearNotification(index) {
-            const notification = document.querySelector(`.contact-item:nth-child(${index + 1}) .contact-notification`);
+        function addActionButtons(isCorrect) {
+            const chatMessages = document.getElementById('chatMessages');
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'action-buttons';
             
-            if (notification) {
-                notification.style.display = 'none';
+            if (isCorrect) {
+                const callBtn = document.createElement('button');
+                callBtn.className = 'action-button';
+                callBtn.textContent = 'Jack is calling you...';
+                callBtn.onclick = () => {
+                    window.location.href = 'finale.html';
+                };
+                buttonsDiv.appendChild(callBtn);
+            } else {
+                const replayBtn = document.createElement('button');
+                replayBtn.className = 'action-button replay';
+                replayBtn.textContent = 'Replay Conversation';
+                replayBtn.onclick = () => {
+                    initializeConversation();
+                };
+                buttonsDiv.appendChild(replayBtn);
+            }
+            
+            chatMessages.appendChild(buttonsDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleChoice(choice) {
+            const contact = contacts[0];
+            
+            contact.messages[contact.messages.length - 1].choices = false;
+
+            if (choice === 'punctuation') {
+                conversationState = 'punctuation_branch';
+                contact.messages.push({
+                    type: "sent",
+                    text: "Why are you using proper punctuation?"
+                });
+                renderChat();
+                addTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "received",
+                        text: "Oh wow, you actually noticed that."
+                    });
+                    renderChat();
+                    addTypingIndicator();
+                }, 600);
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "received",
+                        text: "I do usually type in all lowercase.",
+                        choices: true
+                    });
+                    renderChat();
+                }, 1200);
+            } else if (choice === 'agreeing') {
+                conversationState = 'agreeing_branch';
+                contact.messages.push({
+                    type: "sent",
+                    text: "That sounds fun!"
+                });
+                renderChat();
+                addTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "received",
+                        text: "Right? Come on then.",
+                        choices: true
+                    });
+                    renderChat();
+                }, 600);
+            } else if (choice === 'suspicious') {
+                conversationState = 'suspicious_branch';
+                contact.messages.push({
+                    type: "sent",
+                    text: "That link looks suspicious."
+                });
+                renderChat();
+                addTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "received",
+                        text: "Huh? Why?",
+                        choices: true
+                    });
+                    renderChat();
+                }, 600);
+            } else if (choice === 'call_verify') {
+                contact.messages.push({
+                    type: "sent",
+                    text: "I'll call you to confirm."
+                });
+                renderChat();
+                addTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "received",
+                        text: "Good call."
+                    });
+                    renderChat();
+                    addTypingIndicator();
+                }, 600);
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "system",
+                        text: "Excellent verification behaviour - Calling to verify is the best approach!"
+                    });
+                    renderChat();
+                    addActionButtons(true);
+                }, 1200);
+            } else if (choice === 'what_game') {
+                contact.messages.push({
+                    type: "sent",
+                    text: "What game is this exactly?"
+                });
+                renderChat();
+                addTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "received",
+                        text: "Still in beta. Invite only."
+                    });
+                    renderChat();
+                    addTypingIndicator();
+                }, 600);
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "system",
+                        text: "Smart thinking - Scammers are trained to answer doubts convincingly."
+                    });
+                    renderChat();
+                    addActionButtons(true);
+                }, 1200);
+            } else if (choice === 'try_it') {
+                isWrongChoice = true;
+                contact.messages.push({
+                    type: "sent",
+                    text: "Okay, I'll try it."
+                });
+                renderChat();
+                addTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "received",
+                        text: "Wait, no."
+                    });
+                    renderChat();
+                    addTypingIndicator();
+                }, 600);
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "received",
+                        text: "That was going to fail the test."
+                    });
+                    renderChat();
+                    addTypingIndicator();
+                }, 1200);
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "system",
+                        text: "Unsafe choice - This would have led to the phishing link."
+                    });
+                    renderChat();
+                    addActionButtons(false);
+                }, 1800);
+            } else if (choice === 'more_details') {
+                contact.messages.push({
+                    type: "sent",
+                    text: "Can you send me more details?"
+                });
+                renderChat();
+                addTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "received",
+                        text: "Nice, you're being cautious."
+                    });
+                    renderChat();
+                    addTypingIndicator();
+                }, 600);
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "system",
+                        text: "Good observation - Always ask for more information before clicking."
+                    });
+                    renderChat();
+                    addActionButtons(true);
+                }, 1200);
+            } else if (choice === 'domain' || choice === 'appstore' || choice === 'never_mentioned') {
+                contact.messages.push({
+                    type: "sent",
+                    text: choice === 'domain' ? "I don't recognise the domain." : 
+                          choice === 'appstore' ? "Games usually come from app stores." : 
+                          "You never mentioned this game before."
+                });
+                renderChat();
+                addTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "received",
+                        text: "Yup, that's literally what I was testing."
+                    });
+                    renderChat();
+                    addTypingIndicator();
+                }, 600);
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    contact.messages.push({
+                        type: "system",
+                        text: "Good observation - Question unfamiliar links, even from friends."
+                    });
+                    renderChat();
+                    addActionButtons(true);
+                }, 1200);
             }
         }
 
-        function addNewMessageFromJack() {
-            // Find Jack contact (index 1)
-            const jackContact = contacts[1];
-            jackContact.messages.push({ type: "received", text: "Hey! Did you get the updates?" });
-
-            // Find Jack's contact item in the DOM
-            const contactItems = document.querySelectorAll('.contact-item');
-            const jackContactElement = contactItems[1]; // Jack is at index 1
-
-            // Add animation class to the contact item
-            jackContactElement.classList.add('new-message-notification');
-
-            // Update preview
-            jackContactElement.querySelector('.contact-preview').textContent = "Hey! Did you get the updates?";
-
-            // Show notification indicator
-            let notificationDiv = jackContactElement.querySelector('.contact-notification');
-            if (!notificationDiv) {
-                notificationDiv = document.createElement('div');
-                notificationDiv.className = 'contact-notification';
-                jackContactElement.appendChild(notificationDiv);
-            }
-            notificationDiv.style.display = 'block';
-
-            // If Jack's chat is already open, add the new message with animation
-            if (jackContactElement.classList.contains('active')) {
-                const chatMessages = document.getElementById('chatMessages');
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'message received new-message';
-                messageDiv.innerHTML = `<div class="message-content">Hey! Did you get the updates?</div>`;
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            // Remove animation after it completes
-            setTimeout(() => {
-                jackContactElement.classList.remove('new-message-notification');
-            }, 3000);
+        function closeApp() {
+            const modal = document.getElementById('messages-modal');
+            const overlay = document.getElementById('overlay');
+            
+            modal.classList.remove('active');
+            overlay.classList.remove('active');
         }
-
-        function openPdfModal() {
-            document.getElementById('pdfModal').classList.add('active');
-        }
-
-        function closePdfModal() {
-            document.getElementById('pdfModal').classList.remove('active');
-            pdfRead = true;
-        }
-
-        document.getElementById('pdfModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closePdfModal();
-            }
-        });
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                closePdfModal();
+                closeApp();
             }
         });
     </script>
