@@ -229,6 +229,13 @@
     </style>
 </head>
 <body>
+
+    <!-- Alarm sound -->
+<audio id="alarmSound" loop>
+    <source src="ringing.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
     <div class="image-container">
         <div id="blackScreen" class="black-screen"></div>
         <img id="mainImage" src="calling.png" alt="Description of image">
@@ -272,11 +279,15 @@
             { image: "phone.png", type: "clickable", coords: "288,34,281,218,233,303,620,316,614,223,615,75,601,58,609,37", link: "actually_code.html" }
         ];
 
-        // Start the intro when page loads
         window.addEventListener('load', function() {
-            const blackScreen = document.getElementById('blackScreen');
-            
-            // Start fade out after a delay
+    const blackScreen = document.getElementById('blackScreen');
+    const alarmSound = document.getElementById('alarmSound');
+    
+    // Start playing alarm sound
+    alarmSound.play().catch(e => console.log("Alarm playback blocked: " + e));
+    
+    // Start fade out after a delay
+
             setTimeout(() => {
                 blackScreen.classList.add('fade-out');
                 
@@ -370,16 +381,21 @@
         }
 
         function clickedArea() {
-            const current = dialogues[currentDialogue];
-            hideClickIndicator();
-            
-            // Check if this clickable area has a link
-            if (current.link) {
-                window.location.href = current.link;
-            } else {
-                nextDialogue();
-            }
-        }
+    const alarmSound = document.getElementById('alarmSound');
+    // Stop alarm sound when clicking the first clickable area
+    alarmSound.pause();
+    alarmSound.currentTime = 0;
+    
+    hideClickIndicator();
+    
+    const current = dialogues[currentDialogue];
+    // Check if this clickable area has a link
+    if (current.link) {
+        window.location.href = current.link;
+    } else {
+        nextDialogue();
+    }
+}
 
         function skipIntro() {
             // Jump to cases.html
